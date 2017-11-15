@@ -10,6 +10,8 @@ import bodyParser from 'body-parser'; // PARSE HTML BODY
 import mongoose from 'mongoose';
 import session from 'express-session';
 
+import api from './routes';
+
 
 const app = express();
 const port = 3000;
@@ -17,6 +19,10 @@ const devPort= 4000;
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
+app.use('/api', api);
+// 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
+// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다
+
 
 /* mongodb connection */
 const db = mongoose.connection;
@@ -35,9 +41,16 @@ app.use(session({
 
 app.use('/', express.static(path.join(__dirname, './../public')));
 
-app.get('/hello', (req, res)=>{
-    return res.send('Hello CodeLab');
-});
+// Express 에러처리
+/* handle error, 라우터에서 throw err 가 실행되면 이 코드가 실행됩니다 */
+app.use(function(err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send('Something broke!')
+})
+
+// app.get('/hello', (req, res)=>{
+//     return res.send('Hello CodeLab');
+// });
 
 app.listen(port, ()=>{
     console.log('Express is listening on port', port);
