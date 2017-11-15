@@ -112,3 +112,87 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - 삭제 기능 구현하기: DELETE /api/memo/:id 
     - 수정 기능 구현하기: PUT /api/memo/:id
 
+#### 발견 에러와 해결방법
+- webpack.dev.congig.js 에서 플러그인 경고, 
+- new webpack.optimize.OccurrenceOrderPlugin() ``r 하나 추가`` stackoverflow 참조
+
+### Step 03 (17.11.16)
+
+#### 작업내역
+
+- webpack 설정추가
+    ```js
+    var path = require('path');
+    /* .. 코드 생략 .. */
+    ,
+
+    resolve: {
+        modules: [path.resolve(__dirname, "src"), "node_modules"]
+    }
+    // 위 설정을 추가해주면 React 프로젝트의 루트디렉토리를 설정하여, 
+    // 나중에 ./components 혹은 ../components 이렇게 접근해야 되는 디렉토리를 
+    // 바로 components 로 접근 할 수 있게 해줌.
+    ```
+- 클라이언트사이드에서 필요한 모듈 설치
+    ```
+    npm install --save axios react-addons-update react-router react-timeago redux react-redux redux-thunk
+    ```
+    - axios: HTTP 클라이언트
+
+    - react-addons-update: Immutability Helper (Redux 의 store 값을 변경 할 때 사용됨)
+
+    - react-router: 클라이언트사이드 라우터
+
+    - react-timeago: 3 seconds ago, 3 minutes ago 이런식으로 시간을 계산해서 몇분전인지 나타내주는 React 컴포넌트
+
+    - redux, react-redux; FLUX 구현체, 그리고 뷰 레이어 바인딩
+
+    - redux-thunk: redux의 action creator에서 함수를 반환 할 수 있게 해주는 redux 미들웨어, 비동기작업을 처리 할 때 사용.
+
+- webpack css-loader 와 style-loader 설치
+    ```
+    npm install --save-dev style-loader css-loader
+    // 이 로더들을 통하여 프로젝트에서 css 파일을 require (import) 해서 사용 할 수 있음.
+    ```
+
+- webpack 에 로더 적용
+    ```js
+    module: {
+        loaders: [
+            {
+               /* ... */
+            },
+            {
+                test: /\.css$/,
+                loader: ['style-loader', 'css-loader']
+                // loader: 'style!css-loader' 사용 x
+            }
+        ]
+    },
+    ```
+    - webpack 설정파일이 바뀌고나면 서버를 재시작해야 적용됨.
+
+- CSS 프레임워크 Materializecss 적용.
+    - index.html 에 materializecss 관련 파일들 불러오기
+
+- Materializecss 적용한 Header 만들기
+    - Header 컴포넌트 PropTypes 및 defaultProps 설정하기
+    - 로그인 여부에 따라 다른 버튼 보여주기
+
+#### 발견에러 및 해결방법
+- WebpackOptionsValidationError 발생
+- configuration.resolve has an unknown property 'root'.
+- webpack2부터 resolve.root가 없어진 듯.
+    ```js
+    resolve: {
+        root: path.resolve('./src')
+    }
+    // 더이상 적용 안됨.
+    ```
+
+    ```js
+    resolve: {
+        modules: [path.resolve(__dirname, "src"), "node_modules"]
+    }
+    ```    
+    - 이렇게 바꿔줘서 해결.
