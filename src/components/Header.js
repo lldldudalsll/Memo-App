@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 class Header extends React.Component {
     render(){
 
         const loginButton = (
             <li>
-                <a>
+                <Link to="/login">
                     <i className="material-icons">vpn_key</i>
-                </a>
+                </Link>
             </li>
         );
 
@@ -23,7 +24,7 @@ class Header extends React.Component {
         return (
             <nav>
               <div className="nav-wrapper darken-1">
-                <a className="brand-logo center">MEMOPAD</a>
+                <Link to="/" className="brand-logo center">MEMOPAD</Link>
             
                 <ul>
                   <li><a><i className="material-icons">search</i></a></li>

@@ -20,7 +20,7 @@ module.exports = {
     },
 
     devServer: {
-        hot: true,
+        // hot: true,
         filename: 'bundle.js',
         publicPath: '/',
         historyApiFallback: true,

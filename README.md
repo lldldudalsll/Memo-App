@@ -179,9 +179,44 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - Header 컴포넌트 PropTypes 및 defaultProps 설정하기
     - 로그인 여부에 따라 다른 버튼 보여주기
 
+- react-router 사용하기
+    - react-router 사용법:[https://github.com/reactjs/react-router]
+    - 라우터를 사용 할때는, 우선 루트컴포넌트가 필요 여기선 App.js (x)
+    - App,js 에서 라우터의 각 ‘페이지’들이 렌더링 될 자리를 만들어줘야 함 (x)
+    - {this.props.children}을 사용 (x)
+    - react-router 를 사용하면 이 부분에 우리가 지정한 라우트가 표시 (x)
+
+    - v4로 업데이트 되면서 react-router를 공부해야 할 것 같다.
+    - v4를 공부한뒤 v4를 적용해서 프로젝트를 이어가기로 하자.
+    - router 내부에 있는 child는 단 하나!
+    - react-router v4 를 사용하여 구현 성공! (express서버 라우팅 호환을 안하는 바람에 라우팅이 적용안되는줄 알고 시간낭비가 심했다.)
+
+- 라우트 컴포넌트 – Home, Login, Register 만들기    
+
+- express 서버에서 클라이언트사이드 라우팅을 호환하도록 수정하기 
+    ```js
+    // server/main.js 안 API 하단부에 작성하자!
+    app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, './../public/index.html'));
+    });
+    ```
+
+- 헤더에서 로고 클릭하면 메인 페이지로 이동
+    - react-router 의 Link components 사용! 편하다
+    - 이 컴포넌트는 페이지를 새로 로딩하는것을 막고, 라우트에 보여지는 내용만 변하게 해준다.
+
+- 로그인 / 회원가입 페이지에서는 헤더 보이지 않게 하기    
+
+
+
+</br>
+</br>
+
 #### 발견에러 및 해결방법
 - WebpackOptionsValidationError 발생
+
 - configuration.resolve has an unknown property 'root'.
+
 - webpack2부터 resolve.root가 없어진 듯.
     ```js
     resolve: {
@@ -196,3 +231,9 @@ Express server runs on port 3000, and dev server runs on port 4000.
     }
     ```    
     - 이렇게 바꿔줘서 해결.
+    
+- router 에러 버전이 바뀌면서 많이 변했다 하여 공부를 하고 적용하였다.    
+
+- Switch 사용시 왜 App 컴포넌트는 밖으로 빼야만 다른 컴포넌트들이 보여지는 걸까. 같이 넣는 방법은 없을까?
+
+- 또 404페이지를 만들면 기본 App 컴포넌트에도 404메세지가 뜨는데 어떻게 해결해야할지

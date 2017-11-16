@@ -21,8 +21,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use('/api', api);
 // 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
-// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다
-
+// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다.
 
 /* mongodb connection */
 const db = mongoose.connection;
@@ -68,3 +67,12 @@ if(process.env.NODE_ENV == 'development'){
     );
 }
 
+/* support client-side routing */
+app.get('*', (req, res, next) => {
+    const regExp = /bundle.js$/;
+    if(!regExp.test(req.url)) {
+        res.sendFile(path.resolve(__dirname, './../public/index.html'));
+    } else {
+        next();
+    }
+});

@@ -32,17 +32,23 @@ var _expressSession = require('express-session');
 
 var _expressSession2 = _interopRequireDefault(_expressSession);
 
+var _routes = require('./routes');
+
+var _routes2 = _interopRequireDefault(_routes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// PARSE HTML BODY
-
-var app = (0, _express2.default)(); // HTTP REQUEST LOGGER
+// HTTP REQUEST LOGGER
+var app = (0, _express2.default)(); // PARSE HTML BODY
 
 var port = 3000;
 var devPort = 4000;
 
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
+app.use('/api', _routes2.default);
+// 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
+// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다.
 
 /* mongodb connection */
 var db = _mongoose2.default.connection;
@@ -63,9 +69,16 @@ app.use((0, _expressSession2.default)({
 
 app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public')));
 
-app.get('/hello', function (req, res) {
-    return res.send('Hello CodeLab');
+// Express 에러처리
+/* handle error, 라우터에서 throw err 가 실행되면 이 코드가 실행됩니다 */
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });
+
+// app.get('/hello', (req, res)=>{
+//     return res.send('Hello CodeLab');
+// });
 
 app.listen(port, function () {
     console.log('Express is listening on port', port);
@@ -80,3 +93,13 @@ if (process.env.NODE_ENV == 'development') {
         console.log('webpack-dev-server is listening on port', devPort);
     });
 }
+
+/* support client-side routing */
+app.get('*', function (req, res, next) {
+    var regExp = /bundle.js$/;
+    if (!regExp.test(req.url)) {
+        res.sendFile(_path2.default.resolve(__dirname, './../public/index.html'));
+    } else {
+        next();
+    }
+});
