@@ -231,9 +231,86 @@ Express server runs on port 3000, and dev server runs on port 4000.
     }
     ```    
     - 이렇게 바꿔줘서 해결.
-    
+
 - router 에러 버전이 바뀌면서 많이 변했다 하여 공부를 하고 적용하였다.    
 
 - Switch 사용시 왜 App 컴포넌트는 밖으로 빼야만 다른 컴포넌트들이 보여지는 걸까. 같이 넣는 방법은 없을까?
 
-- 또 404페이지를 만들면 기본 App 컴포넌트에도 404메세지가 뜨는데 어떻게 해결해야할지
+- 또 404페이지를 만들면 기본 App 컴포넌트에도 404메세지가 뜨는데 어떻게 해결해야할지..
+
+- express 서버에서 클라이언트사이드 라우팅을 호환하도록 수정하기 에서
+    ```
+    /* support client-side routing */
+    app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname,    './../public/index.html'));
+    });
+    ```
+    - 이부분이 모든 요청에 대해서 public/index.html을 response 해주는 것 같음. (host:3000 unexpected error)
+
+    - 일단 임시방편으로 이렇게 해결
+        ```
+        app.get('*', (req, res, next) => {
+        const regExp = /bundle.js$/;
+            if(!regExp.test(req.url)) {
+                res.sendFile(path.resolve(__dirname, './../public/index.html'));
+            } else {
+                next();
+            }
+        });
+        ```
+
+- router v4 적용에 시간을 너무 많이 소비했다. 좀 더 집중해서 할 수 있도록 해야지
+
+</br>
+</br>
+
+### Step 04 (17.11.17)
+
+#### 작업내역
+
+- Authentication components 생성하고 설정.
+    - Login 과 Register 라우트는 상당히 비슷하기 때문에 Authentication에서 같이 사용.
+    - 자바스크립트의 값을 전달할땐 항상 ``{braket}`` 으로 감싸주자.
+
+- Header 컴포넌트에서 열쇠 아이콘 누르면 로그인 페이지로 이동 
+
+- loginView 와 registerView 설정하기 (components/Authentication.js)
+
+- input 의 값을 state 로 설정하기 / 변경시 state 업데이트
+
+- Authentication 컴포넌트의 기본적인 뷰 완성
+
+- redux 초기 설정 및 적용
+    - actions, reducers 생성
+    - action, store, reducer 등 기억이 flux, redux 패턴의 작동방식이 기억이 잘안남..일단 다시 한번 보고오자
+    
+- 로그인 기능 구현하기
+    - HTTP client axios 적용.
+
+- loginRequest 구현하기 
+    - loginRequest 는 다른 action creator 랑 다름. 이 함수는 또 다른 함수를 리턴한다. (thunk)
+    - thunk 는 특정 작업의 처리를 미루기위해서 함수로 wrapping 하는것을 의미.
+    - loginRequest 는 dispatch 를 파라미터로 갖는 thunk 를 리턴.
+    ```js
+    export function loginRequest(username, password) {
+        return (dispatch) => {
+            /* do stuffs.. */
+        }
+    }
+    ```
+    - 그리고 나중에 컴포넌트에서 dispatch(loginRequest(username, pssword)) 를 하게 되면
+    - 미들웨어를 통하여 loginRequest 가 반환한 thunk 를 처리.
+
+- authentication 리듀서 – 로그인 기능 완성하기 
+    - thunk 를 리턴하는 loginRequest는 리듀서에서 따로 case를 지정해주지 않아도 됨.
+
+- Login 컨테이너 컴포넌트를 Redux 에 연결
+    - react-redux 를 통하여 컴포넌트를 Redux에 연결.
+    - 로그인요청을하는 loginRequest 와 로그인 요청 상태인 status 를 authentication 컴포넌트에 매핑.
+
+- Login 컨테이너 컴포넌트에 handleLogin 구현하기 
+
+#### 발생 에러와 해결방법
+
+-  net::ERR_EMPTY_RESPONSE 에러 발생. 아직 원인을 모르겠음.
+

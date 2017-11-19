@@ -6,7 +6,7 @@ class Register extends React.Component {
     render() {
         return(
             <div>
-                <Authentication />
+                <Authentication mode={false}/>
             </div>
         );
     }
