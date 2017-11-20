@@ -25,12 +25,12 @@ router.post('/signup', (req, res) => {
     }
 
     // CHECK PASS LENGTH
-    if(req.body.password.lenth < 4 || typeof req.body.password !== "string"){
-        return res.status(400).json({
-            error: 'BAD PASSWORD',
-            code: 2
-        });
-    }
+    // if(req.body.password.length < 4 || typeof req.body.password !== "string"){
+    //     return res.status(400).json({
+    //         error: 'BAD PASSWORD',
+    //         code: 2
+    //     });
+    // }
 
     // CHECK USER EXISTANCE
     Account.findOne({username: req.body.username}, (err, exists) => {

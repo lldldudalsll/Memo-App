@@ -1,8 +1,8 @@
-import WebpackDevServer from 'webpack-dev-server';
-import webpack from 'webpack';
-
 import express from 'express';
 import path from 'path';
+
+import WebpackDevServer from 'webpack-dev-server';
+import webpack from 'webpack';
 
 import morgan from 'morgan'; // HTTP REQUEST LOGGER
 import bodyParser from 'body-parser'; // PARSE HTML BODY
@@ -19,14 +19,11 @@ const devPort= 4000;
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
-app.use('/api', api);
-// 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
-// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다.
 
 /* mongodb connection */
 const db = mongoose.connection;
 db.on('error', console.error);
-db.once('open', () => { console.log('Connected to mongodb server'); });
+db.once('open', function() { console.log('Connected to mongodb server'); });
 // mongoose.connect('mongodb://username:password@host:port/database=');
 mongoose.createConnection('mongodb://localhost/codelab', {
     useMongoClient: true});
@@ -39,6 +36,24 @@ app.use(session({
 }));
 
 app.use('/', express.static(path.join(__dirname, './../public')));
+
+/* setup routers & static directory */
+app.use('/api', api);
+// 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
+// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다.
+
+/* support client-side routing */
+app.get('*', (req, res, next) => {
+    const regExp = /bundle.js$/;
+    if(!regExp.test(req.url)) {
+        res.sendFile(path.resolve(__dirname, './../public/index.html'));
+    } else {
+        next();
+    }
+});
+// app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, './../public/index.html'));
+// });
 
 // Express 에러처리
 /* handle error, 라우터에서 throw err 가 실행되면 이 코드가 실행됩니다 */
@@ -66,13 +81,3 @@ if(process.env.NODE_ENV == 'development'){
         }
     );
 }
-
-/* support client-side routing */
-app.get('*', (req, res, next) => {
-    const regExp = /bundle.js$/;
-    if(!regExp.test(req.url)) {
-        res.sendFile(path.resolve(__dirname, './../public/index.html'));
-    } else {
-        next();
-    }
-});

@@ -308,9 +308,25 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - react-redux 를 통하여 컴포넌트를 Redux에 연결.
     - 로그인요청을하는 loginRequest 와 로그인 요청 상태인 status 를 authentication 컴포넌트에 매핑.
 
-- Login 컨테이너 컴포넌트에 handleLogin 구현하기 
+- Login 컨테이너 컴포넌트에 handleLogin 구현하기
+
+- Login과 Register 구현 에러
+
+- 비밀번호 input에서 엔터를 눌렀을 때 로그인/회원가입 트리거
 
 #### 발생 에러와 해결방법
 
--  net::ERR_EMPTY_RESPONSE 에러 발생. 아직 원인을 모르겠음.
+- net::ERR_EMPTY_RESPONSE 에러 발생. 아직 원인을 모르겠음.
+
+- Uncaught (in promise) TypeError: Cannot read property 'data' of undefined 에러
+
+- 어느 부분이 잘못된건지 모르겠다. 많은 시간을 할애했으나 해결하지 못했다. 
+
+- dispatch에 대한 부분이 잘 이해가 가지 않는다. 또 promise에 대한 공부도 해야 할 듯하다.
+
+- 전체적인 흐름을 제대로 파악하지 못했기 때문에 문제 해결이 늦어지고 있는것이라 본다.
+
+- 이론을 다시 공부하는 방법이 돌아가더라도 에러를 해결할 수 있는 방법일것 같다.
+
+- 내일은 해결할수 있을까..
 
