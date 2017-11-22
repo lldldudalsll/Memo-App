@@ -1,5 +1,5 @@
 import * as types from 'actions/ActionTypes';
-import update from 'react-addons-update'; // Immutability Helper (Redux 의 store 값을 변경 할 때 사용됨)
+import update from 'immutability-helper'; // (Redux 의 store 값을 변경 할 때 사용됨)
 
 const initialState = {
     login: {
