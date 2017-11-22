@@ -335,14 +335,51 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 #### 작업내역
 
-- net::ERR_EMPTY_RESPONSE 에러 해결.
-
-- mongoose.connect('mongodb://localhost:27017') 지정 오류.. 이것때문에 시간을..
-
 - Login과 Register 구현
 
 - 계정 인증구현이 늦어지는데 bcrypt 오류로 일시 중단 해놓은 상태. 나머지 먼저 구현하고 시간나면 repo읽고 적용하자.
 
-- 로그인 세션 확인 구현 / 로그아웃 구현
+- 로그인 세션 확인 구현
     - 로그인 상태라면 로그아웃 버튼을 보여주자
     - 페이지가 새로고침 될 때 현재 세션이 유효한지 체크하는 기능을 구현
+    - getStatusRequest 구현
+    - authentication 리듀서 수정
+    - initialState 의 status 부분에 valid 키 추가
+    - App container 컴포넌트 Redux 연결하기
+    - App container 컴포넌트 세션 확인 기능 구현
+
+- 로그아웃 구현
+    - Action Type 추가
+    - authentication 액션파일 수정
+    - authentication 리듀서 수정
+    - App 컨테이너 컴포넌트에서 mapDispatchToProps 수정 
+    - App 컨테이너 컴포넌트에서 handleLogout 구현 
+    - Header 컴포넌트 수정
+
+- 계정인증 완료!
+
+
+#### 발견에러 및 해결방법
+- net::ERR_EMPTY_RESPONSE 에러 
+    - react-addons-update 더이상 사용 x
+    - immutability-helper 로 $set 변경.
+    - mongoose.connect('mongodb://localhost:27017')로 해결
+
+- bcrypt 오류
+    - 시간이 너무 지체되고 있다. 나중에 적용
+
+- App container 컴포넌트 세션 확인 구현 중 에러
+    - Uncaught TypeError: (0 , _authentication.getStatusRequest) is not a function
+    - The above error occurred in the <App> component
+    - 라우터 문제로 파악하고 라우터 구조를 고쳐보았으나 해결되지 않음.
+    - componentDidMount 안에서 getStatusRequest가 props지정이 안되있어서 그런줄 알고 const { getStatusRequest } = this.props; 했으나 해결x
+    - 문제가 무엇이냐..
+    - request를 requset 철자 에러..실화냐 몇시간을..
+
+- GET /api/account/getInfo 500 발생
+    - session 처리중 req, res 오타로 인한 에러. 해결
+
+- api/account/getInfo 포스트맨에서 401에러. 
+    - 웹상에서 제대로 나옴. 로그인하고 postman으로 실행하면 {success: true}가 나오지 않음.
+    - 로그인도 세션도 유지 되는데 어떤 이유인지 알 수 없다.
+    - 값을 넣을 body도 비활성화 되어있어 값을 넣을 수도 없다. 일단 중요한건 아니라고 판단되 구현 먼저하고 나중에 포스트맨 사용법도 공부좀 해야겠다.
