@@ -115,13 +115,13 @@ router.post('/signin', (req, res) => {
     GET CURRENT USER INFO GET /api/account/getInfo
 */
 router.get('/getinfo', (req, res) => {
-    if(typeof res.session.loginInfo === "undefined"){
+    if(typeof req.session.loginInfo === "undefined"){
         return res.status(401).json({
             error: 1
         });
     }
 
-    res.json({ info: res.session.loginInfo});
+    res.json({ info: req.session.loginInfo });
     // 세션확인이 필요한 이유는, 클라이언트에서 로그인 시, 로그인 데이터를 쿠키에 담고 사용을 하고 있다가,
     // 만약에 새로고침을 해서 어플리케이션을 처음부터 다시 렌더링 하게 될 때, 
     // 지금 갖고 있는 쿠키가 유효한건지 체크를 해야 하기 때문입니다.
