@@ -330,3 +330,19 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - 내일은 해결할수 있을까..
 
+
+### Step 05 (17.11.20)
+
+#### 작업내역
+
+- net::ERR_EMPTY_RESPONSE 에러 해결.
+
+- mongoose.connect('mongodb://localhost:27017') 지정 오류.. 이것때문에 시간을..
+
+- Login과 Register 구현
+
+- 계정 인증구현이 늦어지는데 bcrypt 오류로 일시 중단 해놓은 상태. 나머지 먼저 구현하고 시간나면 repo읽고 적용하자.
+
+- 로그인 세션 확인 구현 / 로그아웃 구현
+    - 로그인 상태라면 로그아웃 버튼을 보여주자
+    - 페이지가 새로고침 될 때 현재 세션이 유효한지 체크하는 기능을 구현
