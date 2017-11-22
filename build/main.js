@@ -1,13 +1,5 @@
 'use strict';
 
-var _webpackDevServer = require('webpack-dev-server');
-
-var _webpackDevServer2 = _interopRequireDefault(_webpackDevServer);
-
-var _webpack = require('webpack');
-
-var _webpack2 = _interopRequireDefault(_webpack);
-
 var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
@@ -15,6 +7,14 @@ var _express2 = _interopRequireDefault(_express);
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
+
+var _webpackDevServer = require('webpack-dev-server');
+
+var _webpackDevServer2 = _interopRequireDefault(_webpackDevServer);
+
+var _webpack = require('webpack');
+
+var _webpack2 = _interopRequireDefault(_webpack);
 
 var _morgan = require('morgan');
 
@@ -46,9 +46,6 @@ var devPort = 4000;
 
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
-app.use('/api', _routes2.default);
-// 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
-// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다.
 
 /* mongodb connection */
 var db = _mongoose2.default.connection;
@@ -68,6 +65,24 @@ app.use((0, _expressSession2.default)({
 }));
 
 app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public')));
+
+/* setup routers & static directory */
+app.use('/api', _routes2.default);
+// 이렇게 서버 메인 파일에서 api 라우터를 불러오게 되면,
+// http://URL/api/account/signup 이런식으로 api 를 사용 할 수 있게 됩니다.
+
+/* support client-side routing */
+app.get('*', function (req, res, next) {
+    var regExp = /bundle.js$/;
+    if (!regExp.test(req.url)) {
+        res.sendFile(_path2.default.resolve(__dirname, './../public/index.html'));
+    } else {
+        next();
+    }
+});
+// app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, './../public/index.html'));
+// });
 
 // Express 에러처리
 /* handle error, 라우터에서 throw err 가 실행되면 이 코드가 실행됩니다 */
@@ -93,13 +108,3 @@ if (process.env.NODE_ENV == 'development') {
         console.log('webpack-dev-server is listening on port', devPort);
     });
 }
-
-/* support client-side routing */
-app.get('*', function (req, res, next) {
-    var regExp = /bundle.js$/;
-    if (!regExp.test(req.url)) {
-        res.sendFile(_path2.default.resolve(__dirname, './../public/index.html'));
-    } else {
-        next();
-    }
-});

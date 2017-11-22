@@ -14,11 +14,16 @@ const Account = new Schema({
 
 // generate hash
 Account.method.generateHash = function(password){
-    return bcrypt.hashSync(password, 8);
+    return bcrypt.genSalt(8, password);
+    // return bcrypt.genSalt(8, function(err, salt){
+    //     bcrypt.hash(" B4c0 / \ / " ,  salt , function(err, hash){
+            
+    //     })
+    // })
 }
 // compares the password
 Account.method.validateHash = function(password){
-    return bcrypt.compareSync(password, this.password);
+    return bcrypt.compare(password, this.password);
 }
 
 // 여기서, Schema 자체에 임의 메소드 두개를 정의해주었습니다.

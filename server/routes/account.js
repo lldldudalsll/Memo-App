@@ -25,12 +25,12 @@ router.post('/signup', (req, res) => {
     }
 
     // CHECK PASS LENGTH
-    // if(req.body.password.length < 4 || typeof req.body.password !== "string"){
-    //     return res.status(400).json({
-    //         error: 'BAD PASSWORD',
-    //         code: 2
-    //     });
-    // }
+    if(req.body.password.length < 4 || typeof req.body.password !== "string"){
+        return res.status(400).json({
+            error: 'BAD PASSWORD',
+            code: 2
+        });
+    }
 
     // CHECK USER EXISTANCE
     Account.findOne({username: req.body.username}, (err, exists) => {
@@ -48,7 +48,7 @@ router.post('/signup', (req, res) => {
             password: req.body.password
         });
 
-        account.password = account.generateHash(account.password);
+        // account.password = generateHash(account.password);
 
         // SAVE IN THE DATABASE
         account.save( err => {
@@ -89,12 +89,12 @@ router.post('/signin', (req, res) => {
         }
 
         // CHECK WHETHER THE PASSWORD IS VALID
-        if(!account.validateHash(res.body.password)){
-            return res.status(401).json({
-                error: "password is invaild, please check the password",
-                code: 1
-            });
-        }
+        // if(!account.validateHash(res.body.password)){
+        //     return res.status(401).json({
+        //         error: "password is invaild, please check the password",
+        //         code: 1
+        //     });
+        // }
 
         // ALTER SESSION
         // express session 을 다루는건 매우 간단합니다.
