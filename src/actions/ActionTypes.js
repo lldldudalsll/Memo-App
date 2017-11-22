@@ -12,3 +12,13 @@ export const AUTH_LOGIN_FAILURE = "AUTH_LOGIN_FAILURE";
 export const AUTH_REGISTER = "AUTH_REGISTER";
 export const AUTH_REGISTER_SUCCESS = "AUTH_REGISTER_SUCCESS";
 export const AUTH_REGISTER_FAILURE = "AUTH_REGISTER_FAILURE";
+
+/* Session */
+export const AUTH_GET_STATUS = "AUTH_GET_STATUS";
+export const AUTH_GET_STATUS_SUCCESS = "AUTH_GET_STATUS_SUCCESS";
+export const AUTH_GET_STATUS_FAILURE = "AUTH_GET_STATUS_FAILURE";
+
+/* Logout */
+export const AUTH_LOGOUT = "AUTH_LOGOUT";
+
+// 로그아웃은 성공하고 안하고가 중요하지 않기 떄문에, 액션 하나로도 충분합니다.
