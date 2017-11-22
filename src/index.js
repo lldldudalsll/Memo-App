@@ -21,15 +21,15 @@ ReactDOM.render(
     <Provider store={store}>
         <Router>
             <div>
-                <Route path="/" component={App}/>
-                <div>
-                    <Switch>
+                {/* <div> */}
+                    {/* <Switch> */}
+                        <Route path="/" component={App}/>
                         <Route path="/home" component={Home}/>
                         <Route path="/login" component={Login}/>
                         <Route path="/register" component={Register}/>
                         {/* <Route path="*" component={NotFound}/> */}
-                    </Switch>
-                </div>
+                    {/* </Switch> */}
+                {/* </div> */}
             </div>
         </Router>
     </Provider>
