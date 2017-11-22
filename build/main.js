@@ -54,7 +54,7 @@ db.once('open', function () {
     console.log('Connected to mongodb server');
 });
 // mongoose.connect('mongodb://username:password@host:port/database=');
-_mongoose2.default.createConnection('mongodb://localhost/codelab', {
+_mongoose2.default.connect('mongodb://localhost:27017', {
     useMongoClient: true });
 
 /* use session */
