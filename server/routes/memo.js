@@ -8,9 +8,6 @@ const router = express.Router();
 /* 
     WRITE MEMO: POST /api/memo
     BODY SAMPLE: { contents: "sample "}
-    ERROR CODESm
-        1: NOT LOGGED IN
-        2: EMPTY CONTENTS
 */
 router.post('/', (req, res) => {
     // CHECK LOGIN STATUS
@@ -53,12 +50,6 @@ router.post('/', (req, res) => {
 /*
     MODIFY MEMO: PUT /api/memo/:id
     BODY SAMPLE: { contents: "sample "}
-    ERROR CODES
-        1: INVALID ID,
-        2: EMPTY CONTENTS
-        3: NOT LOGGED IN
-        4: NO RESOURCE
-        5: PERMISSION FAILURE
 */
 router.put('/:id', (req, res) => {
     
@@ -128,11 +119,6 @@ router.put('/:id', (req, res) => {
 
 /*
     DELETE MEMO: DELETE /api/memo/:id
-    ERROR CODES
-        1: INVALID ID
-        2: NOT LOGGED IN
-        3: NO RESOURCE
-        4: PERMISSION FAILURE
 */
 router.delete('/:id', (req, res) => {
     // CHECK MEMO ID VALIDITY
