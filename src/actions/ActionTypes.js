@@ -22,3 +22,9 @@ export const AUTH_GET_STATUS_FAILURE = "AUTH_GET_STATUS_FAILURE";
 export const AUTH_LOGOUT = "AUTH_LOGOUT";
 
 // 로그아웃은 성공하고 안하고가 중요하지 않기 떄문에, 액션 하나로도 충분합니다.
+
+
+/* MEMO */
+export const MEMO_POST = "MEMO_POST";
+export const MEMO_POST_SUCCESS = "MEMO_POST_SUCCESS";
+export const MEMO_POST_FAILURE = "MEMO_POST_FAILURE";
