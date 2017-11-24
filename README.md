@@ -419,3 +419,39 @@ Express server runs on port 3000, and dev server runs on port 4000.
 </br>
 </br>
 
+### Step 07 (17.11.24)
+
+#### 작업내역
+
+- 읽기 기능 구현하기 01 - Memo 와 MemoList 컴포넌트
+    - 메모 컴포넌트는, 자신의 메모라면 수정/삭제 를 할 수 있도록 옵션 버튼을 우측상단에 만들어주자
+    - Materializecss 의 Dropdown 기능을 통하여 옵션메뉴를 구현
+    - Memo, MemoList 컴포넌트 파일 생성 (src/components/Memo.js)(src/components/MemoList.js)
+    - 컴포넌트 인덱스에 추가 (src/components/index.js)
+    - Memo 컴포넌트를 위한 스타일 추가 (src/style.css)
+    - Memo 컴포넌트 뷰 만들기
+    - MemoList 에 Memo 컴포넌트 렌더링하고 Home 컴포넌트에 MemoList 컴포넌트 렌더링
+    - Memo 컴포넌트 propTypes, defaultProps 지정  
+        - 이 컴포넌트는 Memo에 필요한 값들을 객체형으로 받아오도록 하자.  
+        - 나중에 컴포넌트 Mapping 을 할때 이렇게 하는편이 편하기 때문.
+    - Memo 컴포넌트 렌더링 할 때 props 값 사용하기 (react-timeago / ES6의 Template Literals 사용)
+    - Memo 컴포넌트 memo View 를 따로 분리  
+    나중에 Edit 모드일때는 Write 와 비슷한 뷰를 보여주기 위함.
+    - Memo 컴포넌트의 Dropdown 메뉴 추가 작업  
+        - Dropdown 메뉴가, 자신의 메모일때만 보여주게하고 (ownership 이 true일때)  
+        - Dropdown 메뉴 활성화 작업을 componentDidMount 와 componentDidUpdate 에서 하도록 만들자  
+        - 해당 컴포넌트가 유동적으로 생성되고 업데이트될 경우에는 저희가 따로 활성화작업을 해야 함.
+    - MemoList 컴포넌트 propTypes 와 defaultProps 설정.
+    - Home 컨테이너 컴포넌트에서 Mock Data 로 실험. MemoList 컴포넌트 받은 Mock Data배열 컴포넌트 매핑
+        - 랜더링 성공.
+        - 성공했으니 서버에서 진짜 데이터를 가져오자.
+    - ActionType 추가, action파일 수정.
+    - memoListRequest 구현, memo 리듀서 수정
+    - Home 컨테이너 컴포넌트에서 memoListRequest 사용
+    - Home 컨테이너 컴포넌트 서버에서 받은 결과값 MemoList 로 전달.
+
+- MemoList data api로 불러오기 성공!!
+
+#### 발견에러 및 해결방법
+
+- 딱히 중요한 에러는 없었음.
