@@ -20,7 +20,7 @@ Preview:
 - react
 - react-router
 - react-addons-css-transition-group
-- react-addons-update
+- immutability-helper
 - redux
 - redux-thunk
 - materializecss
@@ -383,3 +383,39 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - 웹상에서 제대로 나옴. 로그인하고 postman으로 실행하면 {success: true}가 나오지 않음.
     - 로그인도 세션도 유지 되는데 어떤 이유인지 알 수 없다.
     - 값을 넣을 body도 비활성화 되어있어 값을 넣을 수도 없다. 일단 중요한건 아니라고 판단되 구현 먼저하고 나중에 포스트맨 사용법도 공부좀 해야겠다.
+
+</br>
+</br>
+
+### Step 06 (17.11.23)
+
+#### 작업내역
+
+- Write 컴포넌트 만들기
+    - Write 컴포넌트 생성(src/components/Write.js)
+    - 컴포넌트 인덱스에 Write 컴포넌트 추가
+    - Write 컴포넌트 뷰 만들기
+    - Home 컴포넌트에서 현재 로그인상태라면 Write 보여주기, wrapper 스타일 클래스 적용 
+    - Write 컴포넌트 textarea 에 state 사용, defaultProps / propTypes 설정
+    - Action Type 추가
+    - memo 액션파일 만들고 memoPostRequest 구현
+    - memo 리듀서 만들기
+    - Home 컨테이너 컴포넌트에서 Redux 연결
+    - Home 컨테이너 컴포넌트에 handlePost 구현
+    - Write 컴포넌트에서 위에서 받은 onPost 사용.
+
+- Memo Creation 완료!
+
+#### 발견에러 및 해결방법
+- Home 컴포넌트 import parsing error
+    - 뭔진 몰라도 재부팅 후 사라짐.
+
+- Cannot read property 'then' of undefined 에러
+    - post는 잘 실행됨.
+    - promise 문법 에러 이유는 아직 모르겠다.
+    - memoPostRequest action을 dispatch 하는 함수를 props로 연결 할때 return 값으로 반환을 하지않아 발생
+    - 해결
+
+</br>
+</br>
+
