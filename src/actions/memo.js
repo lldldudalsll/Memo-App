@@ -4,10 +4,11 @@ import {
     MEMO_POST_FAILURE
 } from './ActionTypes';
 
+// import thunk from 'redux-thunk';
 import axios from 'axios';
-import { error } from 'util';
 
 // MEMO POST
+// 함수와 객체를 반환하는 함수를 만들어 준다!
 export function memoPostRequest(contents) {
     return (dispatch) => {
         // inform MEMO POST API is starting
@@ -15,23 +16,22 @@ export function memoPostRequest(contents) {
 
         return axios.post('/api/memo', { contents })
         .then((response) => {
-            dispatch(memoPostsSuccess());
-        })
-        .catch((error) => {
+            dispatch(memoPostSuccess());
+        }).catch((error) => {
             dispatch(memoPostFailure(error.response.data.code));
-        })
+        });
     };
 }
 
 export function memoPost() {
     return {
-        types: MEMO_POST
+        type: MEMO_POST
     };
 }
 
-export function memoPostsSuccess() {
+export function memoPostSuccess() {
     return {
-        types: MEMO_POST_SUCCESS
+        type: MEMO_POST_SUCCESS
     };
 }
 
