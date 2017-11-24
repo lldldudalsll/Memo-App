@@ -23,9 +23,6 @@ var router = _express2.default.Router();
 /* 
     WRITE MEMO: POST /api/memo
     BODY SAMPLE: { contents: "sample "}
-    ERROR CODESm
-        1: NOT LOGGED IN
-        2: EMPTY CONTENTS
 */
 // Memo 라우터 만들기
 router.post('/', function (req, res) {
@@ -68,12 +65,6 @@ router.post('/', function (req, res) {
 /*
     MODIFY MEMO: PUT /api/memo/:id
     BODY SAMPLE: { contents: "sample "}
-    ERROR CODES
-        1: INVALID ID,
-        2: EMPTY CONTENTS
-        3: NOT LOGGED IN
-        4: NO RESOURCE
-        5: PERMISSION FAILURE
 */
 router.put('/:id', function (req, res) {
 
@@ -142,11 +133,6 @@ router.put('/:id', function (req, res) {
 
 /*
     DELETE MEMO: DELETE /api/memo/:id
-    ERROR CODES
-        1: INVALID ID
-        2: NOT LOGGED IN
-        3: NO RESOURCE
-        4: PERMISSION FAILURE
 */
 router.delete('/:id', function (req, res) {
     // CHECK MEMO ID VALIDITY
