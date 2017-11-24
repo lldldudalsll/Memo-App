@@ -11,7 +11,6 @@ import {
     AUTH_LOGOUT
 } from './ActionTypes';
 
-import thunk from 'redux-thunk';
 import axios from 'axios';
 
 
