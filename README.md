@@ -455,3 +455,172 @@ Express server runs on port 3000, and dev server runs on port 4000.
 #### 발견에러 및 해결방법
 
 - 딱히 중요한 에러는 없었음.
+
+</br>
+</br>
+
+### Step 08 (17.11.25)
+
+#### 작업내역
+
+- 읽기 기능 구현하기 02 – 추가 로딩 (새 메모 / 이전 메모)
+    - 새로운 메모 혹은 이전 메모를 읽어와야 함.
+        - 현재 페이지에 로딩되어있는 데이터 중에서 (초기로딩 된 데이터) 가장 위에 있는 메모의  
+        _id 값보다 높은 _id 를 갖고있는 메모를 쿼리하면 새로운 메모들을 읽을 수 있고  
+        가장 아래에 있는 메모의 _id 값보다 낮은 _id 를 갖고있는 메모를 쿼리하면 이전 메모들을 읽을 수 있을 것.
+
+    - 메모 추가 로딩 API 구현
+
+#### 발견에러 및 해결방법
+
+- 없음
+
+
+### Step 09 (17.11.28)
+
+#### 작업내역
+
+- 읽기 기능 구현하기 02 – 추가 로딩 (새 메모 / 이전 메모)
+    - memoListRequest 추가구현
+        - 구현한 API 에 맞춰서 파라미터에 따라 URL 을 설정
+    - memo 리듀서 MEMO_LIST_SUCCESS 부분 수정
+        - unshift 사용으로 앞부분에 데이터를 추가.
+    - Home 컨테이너 컴포넌트에서 5초마다 새 메모 로딩
+        - mapStateToProps 에서 state.memo.list.status 를 매핑
+        - loadNewMemo 는 새 메모를 읽어들일 때 사용
+        - 메모 요청 상태가 ‘WAITING’ 일 때는 로딩을 하지 않도록 
+        - 비어있는 Promise 를 리턴한 이유는 Write 에서 해당 메소드를 입력하고 .then 을 사용 할 수 있게 만들기 위함
+        - 페이지가 비어있을 경우에는 초기로딩을 시도
+        - componentDidMount 에서, timeout 기능을 통하여 이 작업을 5초마다 반복하도록 설정
+    - 작성 시, 새 메모를 읽도록 트리거하기
+    ```js
+    (src/containers/Home.js)
+    handlePost(contents) {
+        return this.props.memoPostRequest(contents).then(
+            () => {
+                if(this.props.postStatus.status === "SUCCESS") {
+                    // TRIGGER LOAD NEW MEMO
+                    this.loadNewMemo().then(
+                        () => {
+                            Materialize.toast('Success!', 2000);
+                        }
+                    );
+                }
+    /* CODES */
+    ```
+        - 메모가 작성되면 새 메모를 읽어오도록 명령하고, 해당 작업이 끝나면 성공했다고 알림을 띄움.
+
+- 무한스크롤링 구현
+    - Home 컨테이너 컴포넌트 스크롤 리스너 작성
+    ```js
+    componentDidMount() {
+        /* CODES */
+
+        $(window).scroll(() => {
+            // WHEN HEIGHT UNDER SCROLLBOTTOM IS LESS THEN 250
+            if ($(document).height() <= $(window).scrollTop() + $(window).height()) {
+                console.log('LOAD NOW');
+            }
+        })
+    }
+    ```
+    - 구간에 들어갔을때 처음에만 한번 코드를 실행하게 해야한다.
+    - 이 문제는 state 를 사용하여 해결
+    ```js
+    constructor(props) {
+        super(props);
+
+        this.loadNewMemo = this.loadNewMemo.bind(this);
+        this.handlePost = this.handlePost.bind(this);
+
+        this.state = {
+            loadingState: false
+        };
+    }
+
+    componentDidMount() {
+        /* CODES */
+        $(window).scroll(() => {
+            // WHEN HEIGHT UNDER SCROLLBOTTOM IS LESS THEN 250
+            if ($(document).height() - $(window).height() - $(window).scrollTop() < 250) {
+                if(!this.state.loadingState){
+                    console.log("LOAD NOW");
+                    this.setState({
+                        loadingState: true
+                    });
+                }
+            } else {
+                if(this.state.loadingState){
+                    this.setState({
+                        loadingState: false
+                    });
+                }
+            }
+        });
+                  
+    }
+    ```
+    - Home 컨테이너 컴포넌트에 실제 로딩 구현
+        - mapStateToProps 부분에 state.memo.list.isLast 를 연결 (마지막 페이지에 도달 했을 시, 요청을 취소하기 위함)
+        - loadOldMemo 메소드 만듦
+        - 만약에 현재 읽고 있는 페이지가 마지막 페이지라면 요청이 취소되도록.
+        - 나중에 이 메소드를 사용하고 .then() 을 사용 할 수 있도록 취소 할 땐 비어있는 Promise 를 리턴 (이 부분 이해가 잘 안감)
+        - 이전 메모들을 불러오기위하여 페이지에 로드된 메모 중 최하단 메모의 id 를 API로 전해주기
+        - API 를 실행 후, 만약에 방금 읽어들인 페이지가 마지막페이지라면 알림을 띄우도록
+        - componentWillUnmount 에는 스크롤 리스너를 제거하는 unbind 코드 추가.
+
+    - 사용자 화면의 해상도가 무척 높다면 처음에 스크롤바가 생기지 않을것.
+        - 초기 로딩을 한다음에 스크롤바가 만약에 안생겼다면 이전 메모로딩을 스크롤바가 생길 때 까지 반복
+        - 스크롤바가 있는지 없는지 체크
+        ```js
+        componentDidMount() {
+        /* CODES */
+
+            const loadUntilScrollable = () => {
+                // IF THE SCROLLBAR DOES NOT EXIST,
+                if($("body").height() < $(window).height()) {
+                    this.loadOldMemo().then(
+                        () => {
+                            // DO THIS RECURSIVELY UNLESS IT'S LAST PAGE
+                            if(!this.props.isLast) {
+                                loadUntilScrollable();
+                            }
+                        }
+                    );
+                }
+            };
+
+            this.props.memoListRequest(true).then(
+                () => {
+                    // BEGIN NEW MEMO LOADING LOOP
+                    loadUntilScrollable();
+                    loadMemoLoop();
+                }
+            );
+
+
+            /* CODES */
+
+
+        }
+        ```
+
+
+#### 발견에러 및 해결방법
+- jquery scroll이 사용되지 않아 다르게 구현해서 해결
+- server/routes/memo 에서 memos 철자 에러 해결.
+- 스크롤시 oldmemo 불러오지 못하는 에러. 
+    - reducer 에서 data $push 를 하지 않음.
+    - 해결
+- 지난 post를 불러오는 GET이 너무 느리다 어떻게 해결해야 할지 잘 모르겠다.
+- memoloop사용시 스크롤링으로 예전 메모를 로드하면 5초가 지난뒤 화면엔 최근 메모로 다시 돌아가는 문제. 해결못함
+- memoloop사용x
+    ```js
+    loadNewMemo() {
+        /* code */
+
+        return this.props.memoListRequest(true, 'new', this.props.memoData[0]._id);
+        // 이 부분 true도 false여야 하는데 false로 하면 새메모가 트리거 되지도 않고
+        // 같은 키를 가진 차일드가 두개가 있다고 에러가 나는데 뭔지 모르겠음..
+    }
+    ```
