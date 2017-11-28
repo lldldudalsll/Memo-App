@@ -190,10 +190,54 @@ router.get('/', function (req, res) {
     });
 });
 
-// 지금으로서는, 작성된 메모들을 최신부터 오래된것 순서로 6개만 읽어옵니다.
+// 지금으로서는, 작성된 메모들을 최신부터 오래된것 순서로 6개만 읽어옴.
 
 // 나중에, 무한 스크롤링을 구현 할 때는, 특정 _id 보다 낮은 메모 6개 읽기,
 // 새로운 메모를 읽어올 때에는, 특정 _id 보다 높은 메모읽기,
-// 그리고 유저를 검색할 때 사용 될 특정 유저의 메모 읽기 기능을 구현 할 것입니다.
+// 그리고 유저를 검색할 때 사용 될 특정 유저의 메모 읽기 기능을 구현 할 것
+
+/*
+    READ ADDITIONAL (OLD/NEW) MEMO: GET /api/memo/:listType/:id
+*/
+router.get('/:listType/:id', function (req, res) {
+    var listType = req.params.listType;
+    var id = req.params.id;
+
+    // CHECK LIST TYPE VALIDITY
+    if (listType !== 'old' && listType !== 'new') {
+        return res.status(400).json({
+            error: "INVALID LISTTYPE",
+            code: 1
+        });
+    }
+
+    // CHECK MEMO ID VALIDITY
+    if (!_mongoose2.default.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            error: "INVALID ID",
+            code: 2
+        });
+    }
+
+    var objId = new _mongoose2.default.Types.ObjectId(req.params.id);
+
+    if (listType === 'new') {
+        // GET NEWER MEMO
+        _memo2.default.find({ _id: { $gt: objId } }) // objId 보다 큰 값을 조회해
+        .sort({ _id: -1 }) // 내림차순으로 정렬하고
+        .limit(6) // 6개만 보여지게 하고
+        .exec(function (err, memos) {
+            // Used callback
+            if (err) throw err;
+            return res.json(memos);
+        });
+    } else {
+        // GET OLDER MEMO
+        _memo2.default.find({ _id: { $lt: objId } }).sort({ _id: -1 }).limit(6).exec(function (err, memos) {
+            if (err) throw err;
+            return res.json(memos);
+        });
+    }
+});
 
 exports.default = router;
