@@ -5,15 +5,119 @@ import { memoPostRequest, memoListRequest } from 'actions/memo';
 
 class Home extends React.Component {
 
-    componentDidMount() {
-        this.props.memoListRequest(true)
-        // .then( ()=>{console.log(this.props.memoData);} )
-    }
-
     constructor(props) {
         super(props);
 
         this.handlePost = this.handlePost.bind(this);
+        this.loadNewMemo = this.loadNewMemo.bind(this);
+        this.loadOldMemo = this.loadOldMemo.bind(this);
+
+        this.state = {
+            loadingState: false
+        }
+    }
+
+    componentDidMount() {
+        // LOAD NEW MEMO EVERY 5 SECONDS
+        // const loadMemoLoop = () => {
+        //     this.loadNewMemo().then(
+        //         () => {
+        //             this.memoLoaderTimeoutId = setTimeout(loadMemoLoop, 5000);
+        //         }
+        //     );
+        // };
+
+        const loadUntilScrollable = () => {
+            // IF THE SCROLLBAR DOES NOT EXIST,
+            if($("body").height() < $(window).height()) {
+                this.loadOldMemo().then(
+                    () => {
+                        // DO THIS RECURSIVELY UNLESS IT'S LAST PAGE
+                        if(!this.props.isLast) {
+                            loadUntilScrollable();
+                        }
+                    }
+                );
+            }
+        };
+
+        this.props.memoListRequest(true, undefined, undefined, this.props.username).then(
+            () => {
+                // BEGIN NEW MEMO LOADING LOOP
+                loadUntilScrollable();
+                // loadMemoLoop();
+            }
+        );
+
+        $(window).scroll(() => {
+            // WHEN HEIGHT UNDER SCROLLBOTTOM IS LESS THEN 250
+            if($(document).height() <= $(window).height() + $(window).scrollTop()) {
+                if(!this.state.loadingState) {
+                    // console.log('LOAD NOW');
+                    this.loadOldMemo();
+                    this.setState({
+                        loadingState: true
+                    });
+                }
+            } else {
+                if(this.state.loadingState) {
+                    this.setState({
+                        loadingState: false
+                    });
+                }
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        // STOPS THE loadMemoLoop
+        clearTimeout(this.memoLoaderTimeoutId);
+
+        // REMOVE WINDOWS SCROLL LISTENER
+        $(window).unbind();
+    }
+
+    loadNewMemo() {
+        // CANCEL IF THERE IS A PENDING REQUEST
+        if(this.props.listStatus === 'WAITING') { // 새 메모를 작성 할 때 새 메모를 읽게 끔 트리거 하는 기능도 구현 할 텐데, 
+                                                  // 상태가 ‘WAITING’ 일때 무시하는 코드를 넣지 않으면 똑같은 요청을 두번 할 수 도 있게 되기 때문입니다.
+            return new Promise((resolve, reject) => {
+                resolve();
+                // 이 부분에서 그냥 return 을 해도 되지만, 비어있는 Promise 를 리턴한 이유는, Write 에서 해당 메소드를 입력하고 
+                // .then 을 사용 할 수 있게 만들기 위함입니다
+                // (메소드를 실행 하고, 성공메시지 / Write 내용초기화를 할건데,
+                // 여기서 그냥 return; 을 날려버리면 만약에 요청이 중첩됐을 때 먹통이 됩니다)
+            });
+        }
+        // IF PAGE IS EMPTY, DO THE INITIAL LOADING
+        if(this.props.memoData.length === 0) 
+            return this.props.memoListRequest(true);
+        
+
+        return this.props.memoListRequest(true, 'new', this.props.memoData[0]._id);
+    }
+
+    loadOldMemo() {
+        // CANCEL IF USER IS READING THE LAST PAGE
+        if(this.props.isLast) {
+            return new Promise(
+                (resolve, reject)=> {
+                    resolve();
+                }
+            );
+        }
+
+        // GET ID OF THE MEMO AT THE BOTTOM
+        let lastId = this.props.memoData[this.props.memoData.length - 1]._id;
+
+        // START REQUEST
+        return this.props.memoListRequest(false, 'old', lastId).then(() => {
+            // IF IT IS LAST PAGE, NOTIFY
+            
+            if(this.props.isLast) {
+                Materialize.toast('You are reading the last page', 2000);
+            }
+        });
     }
 
     // Post memo
@@ -22,8 +126,11 @@ class Home extends React.Component {
             () => {
                 if(this.props.postStatus.status === 'SUCCESS') {
                     // TRIGGER LOAD NEW MEMO
-                    
-                    Materialize.toast('Success!', 2000);
+                    this.loadNewMemo().then(
+                        () => {
+                            Materialize.toast('Success!', 2000);
+                        }
+                    );
                 } else {
                     let $toastContent
                     switch(this.props.postStatus.error) {
@@ -64,7 +171,9 @@ const mapStateToProps = (state) => {
         isLoggedIn: state.authentication.status.isLoggedIn,
         postStatus: state.memo.post,
         currentUser: state.authentication.status.currentUser,
-        memoData: state.memo.list.data
+        memoData: state.memo.list.data,
+        listStatus: state.memo.list.status,
+        isLast: state.memo.list.isLast
     };
 };
 // redux state안에 있는걸 이 컴포넌트의 props로 mapping해주는 것.
