@@ -58,9 +58,26 @@ export default function memo(state, action) {
                         isLast: { $set: action.data.length < 6 }
                     }
                 });
+            } else {
+                if(action.isInitial === "new") {
+                    return update(state, {
+                        list: {
+                            status: { $set: 'SUCCESS'},
+                            data: { $unshift: action.data }
+                            // 배열의 앞 부분에 데이터를 추가할땐 $unshift 연산자를, 뒷 부분에 추가 할 땐 $push 연산자를 사용.
+                        }
+                    });
+                } else {
+                    return update(state, {
+                        list: {
+                            status: { $set: 'SUCCESS' },
+                            data: { $push: action.data },
+                            isLast: { $set: action.data.length < 6 }
+                        }
+                    });
+                }
             }
-            // loading older or newer memo
-            // to be implemented..
+            
             return state;
         case types.MEMO_LIST_FAILURE:
             return update(state, {
