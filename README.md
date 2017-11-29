@@ -1,13 +1,14 @@
-# React-Codelab-Project MEMO-APP
+# React-Project <MEMO-APP>
 
 ## About
-
-MEMO-APP 는 SPA를 사용한 무한스크롤링형 메모장 application입니다. React.js, Redux, Express.js and MongoDB 를 사용했습니다.
+MEMO-APP 는 SPA를 사용한 무한스크롤링형 메모장 application입니다.  
+React.js, Redux, Express.js and MongoDB 를 사용했습니다.  
+출처: [https://velopert.com/tag/reactcodelab](https://velopert.com/tag/reactcodelab) 
 
 ## Features
-- Authentication (Sign Up / Sign In)
-- Memo Creation / Manipulation (edit, delete, star)
-- User Search
+- 계정인증 (Sign Up / Sign In)
+- 메모 작성 및 조작 (edit, delete, star)
+- 유저 검색
 
 Preview: 
 
@@ -51,7 +52,6 @@ Express server runs on port 3000, and dev server runs on port 4000.
 ### Step 01 (17.11.14)
 
 #### 작업 내역
-- 출처: [https://velopert.com/tag/reactcodelab](https://velopert.com/tag/reactcodelab) 
 - 공부목적이니 create-react-app을 사용하지 않았음
 - 기본 디렉토리 설정
 - 기본 환경설정 완료 (react, react-dom, webpack, babel, express, mongoose, morgan)
@@ -475,6 +475,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - 없음
 
+</br>
+</br>
 
 ### Step 09 (17.11.28)
 
@@ -607,7 +609,6 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 
 #### 발견에러 및 해결방법
-- jquery scroll이 사용되지 않아 다르게 구현해서 해결
 - server/routes/memo 에서 memos 철자 에러 해결.
 - 스크롤시 oldmemo 불러오지 못하는 에러. 
     - reducer 에서 data $push 를 하지 않음.
@@ -624,3 +625,50 @@ Express server runs on port 3000, and dev server runs on port 4000.
         // 같은 키를 가진 차일드가 두개가 있다고 에러가 나는데 뭔지 모르겠음..
     }
     ```
+
+</br>
+</br>
+
+### Step 10 (17.11.29)
+
+#### 작업내역
+- 삭제기능 구현하기
+    - Action Types 추가
+    - memo action 파일 수정
+    - memoRemoveRequest 구현
+    - memo 리듀서 파일 수정
+    - Home 컨테이너 컴포넌트에서 삭제를 위한 state/dispatch 매핑
+    - handleRemove 구현
+    - MemoList 컴포넌트에서 위에서 받은 값 Memo 로 전달
+    - Memo 컴포넌트 삭제기능 구현
+
+- 수정기능 구현하기  
+    메모 수정의 경우, 메모 수정이 성공하면, 수정된 메모 객체를 반환
+    전달받은 객체를 리스트에 있던 데이터가 있던 자리에 갈아끼워주자.
+    - Memo 컴포넌트 수정기능 토글
+    - Memo 컴포넌트 editView 완성하기
+    - Action Type 추가, memo 액션파일 수정 
+    - memoEditRequest 구현
+    - memo 리듀서 수정
+    - Home 컨테이너 컴포넌트에서 memoEditRequest, editStatus 매핑 
+    - handleEdit 구현
+    - MemoList 컴포넌트에서 onEdit 함수 Memo로 전달
+    - Memo 컴포넌트 수정기능 구현
+
+
+#### 발견에러 및 해결방법
+- Encountered two children with the same key error 
+    - reducer에서 listsuccess시에 if, else문과 return에서 문제발생하는 걸로 보여 수정. 해결
+- handleRemove method 에서 500(Internal Server Error) 에러.
+    - server/routes/memo.js 에서 req를 res로 철자오류
+        ```js
+        Memo.findById(req.params.id, (err, memo) => {
+            // codes..
+        }
+        ```
+- 맨 위에 있는 메모들은 delete시에 없어지지만 다른 아이디가 생성한 메모 밑에 있는 메모들은   
+  delete api는 적용되지만 새로고침하지 않는 이상 뷰에서 사라지지 않는 문제
+- 에러가 있는 5초마다 새로운 뷰 랜더링을 구현 하더라도 지운다움 5초나 뒤에 삭제 확인된다는 건 분명한 오류로 보인다. 수정이 필요.
+- put 요청은 되는데 Cannot read property 'writer' of undefined,  
+  he above error occurred in the <MemoList> component: 에러 발생.
+  - actions/memo.js에서 ``dispatch(memoEditSuccess(index, response.data.memo));`` 부분 뒤 memo를 contents 로 오타 
