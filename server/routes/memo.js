@@ -138,7 +138,7 @@ router.delete('/:id', (req, res) => {
     }
 
     // FIND MEMO AND CHECK FOR WRITER
-    Memo.findById(res.params.id, (err, memo) => {
+    Memo.findById(req.params.id, (err, memo) => {
         if(err) throw err;
 
         if(!memo){
