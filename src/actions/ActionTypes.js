@@ -44,3 +44,8 @@ export const MEMO_REMOVE_FAILURE = "MEMO_REMOVE_FAILURE";
 export const MEMO_EDIT = "MEMO_EDIT";
 export const MEMO_EDIT_SUCCESS = "MEMO_EDIT_SUCCESS";
 export const MEMO_EDIT_FAILURE = "MEMO_EDIT_FAILURE";
+
+/* Star */
+export const MEMO_STAR = "MEMO_STAR";
+export const MEMO_STAR_SUCCESS = "MEMO_STAR_SUCCESS";
+export const MEMO_STAR_FAILURE = "MEMO_STAR_FAILURE";
