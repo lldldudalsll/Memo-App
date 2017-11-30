@@ -614,8 +614,7 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - reducer 에서 data $push 를 하지 않음.
     - 해결
 - 지난 post를 불러오는 GET이 너무 느리다 어떻게 해결해야 할지 잘 모르겠다.
-- memoloop사용시 스크롤링으로 예전 메모를 로드하면 5초가 지난뒤 화면엔 최근 메모로 다시 돌아가는 문제. 해결못함
-- memoloop사용x
+- memoloop사용시 스크롤링으로 예전 메모를 로드하면 5초가 지난뒤 화면엔 최근 메모로 다시 돌아가는 문제.
     ```js
     loadNewMemo() {
         /* code */
@@ -625,6 +624,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
         // 같은 키를 가진 차일드가 두개가 있다고 에러가 나는데 뭔지 모르겠음..
     }
     ```
+    - reducer에서 return을 두번함으로 인한 오류같음 해결됨.
+
 
 </br>
 </br>
@@ -666,9 +667,71 @@ Express server runs on port 3000, and dev server runs on port 4000.
             // codes..
         }
         ```
-- 맨 위에 있는 메모들은 delete시에 없어지지만 다른 아이디가 생성한 메모 밑에 있는 메모들은   
+- 맨 위에 있는 메모들은 delete시에 없어지지만 다른 아이디가 생성한 메모 밑에 있는 어떤 메모들은   
   delete api는 적용되지만 새로고침하지 않는 이상 뷰에서 사라지지 않는 문제
-- 에러가 있는 5초마다 새로운 뷰 랜더링을 구현 하더라도 지운다움 5초나 뒤에 삭제 확인된다는 건 분명한 오류로 보인다. 수정이 필요.
 - put 요청은 되는데 Cannot read property 'writer' of undefined,  
   he above error occurred in the <MemoList> component: 에러 발생.
   - actions/memo.js에서 ``dispatch(memoEditSuccess(index, response.data.memo));`` 부분 뒤 memo를 contents 로 오타 
+
+</br>
+</br>
+
+### Step 11 (17.12.01)
+
+#### 작업내역
+
+- 로딩, 삭제시 애니메이션  
+    ReactCSSTransitionGroup 라이브러리 사용  
+    특정 컴포넌트가 로딩 될 때 지정한 CSS 클래스를 적용시켜주고, 언로딩 될 때   
+    언로딩을 지정한 시간만큼 지연시킨후 CSS 클래스를 적용시킨다음에 애니메이션이 끝나면 언로딩시킴.
+    - memo-enter스타일 클래스 추가
+    - MemoList 컴포넌트에서 ReactCSSTransitionGroup 사용 
+    - 새메모 작성시 fade-in 되고 삭제시 fade-out 되면서 오른쪽으로 Slide 되도록.(바로 사라지면 부자연스럽기때문에, height 를 서서히 0으로 조절)
+    - 메모가 삭제될때 가로 스크롤바가 페이지에 만들어지지 않도록 style의 최상단에 overflow-x 를 hidden으로 설정
+
+- 별점 주기 기능
+    - 별점 API 구현
+    - Action Types 추가
+    - memo 액션파일 수정
+    - memoStarRequest 구현
+    - memo 리듀서 파일 수정
+    - Home 컨테이너 컴포넌트 memoStarRequest, starStatus 매핑하기 
+    - handleStar 구현
+    - MemoList 컴포넌트 수정
+    - Memo 컴포넌트 handleStar 구현
+
+- 성능 최적화
+    - Memo 컴포넌트의 render() 메소드의 최상단에 console.log(this.props.data) 를 입력하고 개발자도구를 켜보면   
+    렌더링이 엄청나게 많이 진행되고있다는 사실을 파악 할 수 있을겁니다.  
+    변경되지 않은 이미 렌더링 한 컴포넌트에서 render() 메소드가 실행되고있다.  
+    이 문제가 발생하는 이유는, redux store 에 API 관련 status 가 업데이트 될 때도 컴포넌트가 업데이트되기 때문  
+    (컴포넌트가 다시 렌더링 되지는 않지만, render 메소드가 실행 되고, 변화가 있나 없나 계산을 하기 때문)  
+    이 문제를 해결하기 위해서 먼저 MemoList 컴포넌트를 수정
+    </br>
+    ``문제점 1``: 5초마다 새 게시물 불러오기 시도를 할 때, 새로운 게시물이 없더라도 렌더링 메소드가 실행 된다, 그것도 두번.  
+    ``이유``: Home 컴포넌트의 listStatus.status 가 ‘WAITING’ 로 변한다음, ‘SUCCESS’ 로 변하면서 두번
+    </br>
+    ``문제점 2``: 스크롤 해서 이전 게시물을 불러오려고 시도 할 때, 렌더링 메소드가 4번이나 실행 된다.  
+    ``이유``: Home 컴포넌트의 무한스크롤링을 위한 state.loadingStatus 이 토글 되면서 한번, listStatus 때문에 두번,   
+    마지막으로 Home 컴포넌트에서 새 데이터를 갖다줘서 한번
+
+    - MemoList 컴포넌트가 전달 받은 props 가 변경 될 때 render 메소드가 트리거 됨.  
+    그리고 전달받은 props에 변화가 없더라도 패런트 컴포넌트 (Home) 에서 render 메소드가 실행 될 때도 render 메소드가 트리거  
+    이를 막아주려면 LifeCycle API 인 shouldComponentUpdate 를 사용해야 함.
+
+    - MemoList 컴포넌트에 shouldComponentUpdate 메소드 추가
+    ```js
+    shouldComponentUpdate(nextProps, nextState) {
+        let update = JSON.stringify(this.props) !== JSON.stringify(nextProps);
+        return update;
+    }
+    ```
+    위와 같이 전달받은 props 값이 달라질때만 render() 메소드를 실행하도록 설정하면 위 문제들이 완화됨.
+
+    - Memo 컴포넌트에 shouldComponentUpdate 메소드 추가 
+        - 이렇게 추가해주면 CPU 자원이 낭비되는 문제를 해결.
+
+
+#### 발견에러 및 해결방법
+    - 별점시 404에러. memoStarRequest 요청시에 /api/memo/star/ 에서 star 뒤 / 빼먹음으로 인한 에러. 
+
