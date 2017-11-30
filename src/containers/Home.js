@@ -5,9 +5,10 @@ import {
     memoPostRequest, 
     memoListRequest, 
     memoRemoveRequest,
-    memoEditRequest
+    memoEditRequest,
+    memoStarRequest
 } from 'actions/memo';
-import { memoEditSuccess } from '../actions/memo';
+import { memoEditSuccess, memoStarSuccess } from '../actions/memo';
 
 class Home extends React.Component {
 
@@ -17,6 +18,7 @@ class Home extends React.Component {
         this.handlePost = this.handlePost.bind(this);
         this.handleRemove = this.handleRemove.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
+        this.handleStar = this.handleStar.bind(this);
         this.loadNewMemo = this.loadNewMemo.bind(this);
         this.loadOldMemo = this.loadOldMemo.bind(this);
 
@@ -27,13 +29,13 @@ class Home extends React.Component {
 
     componentDidMount() {
         // LOAD NEW MEMO EVERY 5 SECONDS
-        // const loadMemoLoop = () => {
-        //     this.loadNewMemo().then(
-        //         () => {
-        //             this.memoLoaderTimeoutId = setTimeout(loadMemoLoop, 5000);
-        //         }
-        //     );
-        // };
+        const loadMemoLoop = () => {
+            this.loadNewMemo().then(
+                () => {
+                    this.memoLoaderTimeoutId = setTimeout(loadMemoLoop, 5000);
+                }
+            );
+        };
 
         const loadUntilScrollable = () => {
             // IF THE SCROLLBAR DOES NOT EXIST,
@@ -53,7 +55,7 @@ class Home extends React.Component {
             () => {
                 // BEGIN NEW MEMO LOADING LOOP
                 loadUntilScrollable();
-                // loadMemoLoop();
+                loadMemoLoop();
             }
         );
 
@@ -103,7 +105,7 @@ class Home extends React.Component {
             return this.props.memoListRequest(true);
         
 
-        return this.props.memoListRequest(true, 'new', this.props.memoData[0]._id);
+        return this.props.memoListRequest(false, 'new', this.props.memoData[0]._id);
     }
 
     loadOldMemo() {
@@ -242,6 +244,39 @@ class Home extends React.Component {
         );
     }
 
+    // Starred
+    handleStar(id, index) {
+        this.props.memoStarRequest(id, index).then(
+            () => {
+                if(this.props.starStatus.status !== 'SUCCESS') {
+                    /*
+                        TOGGLES STAR OF MEMO: POST /api/memo/star/:id
+                        ERROR CODES
+                            1: INVALID ID
+                            2: NOT LOGGED IN
+                            3: NO RESOURCE
+                    */
+                    let errorMessage= [
+                        'Something broke',
+                        'You are not logged in',
+                        'That memo does not exist'
+                    ];
+                    
+                    
+                    // NOTIFY ERROR
+                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.starStatus.error - 1] + '</span>');
+                    Materialize.toast($toastContent, 2000);
+    
+    
+                    // IF NOT LOGGED IN, REFRESH THE PAGE
+                    if(this.props.starStatus.error === 2) {
+                        setTimeout(()=> {location.reload(false)}, 2000);
+                    }
+                }
+            }
+        )
+    }
+
     render() {
         const write = ( <Write onPost={this.handlePost}/> );
 
@@ -252,6 +287,7 @@ class Home extends React.Component {
                           currentUser={this.props.currentUser}
                           onRemove={this.handleRemove}
                           onEdit={this.handleEdit}
+                          onStar={this.handleStar}
                           />
             </div>
         );
@@ -267,7 +303,8 @@ const mapStateToProps = (state) => {
         listStatus: state.memo.list.status,
         isLast: state.memo.list.isLast,
         removeStatus: state.memo.remove,
-        editStatus: state.memo.edit
+        editStatus: state.memo.edit,
+        starStatus: state.memo.star
     };
 };
 // redux state안에 있는걸 이 컴포넌트의 props로 mapping해주는 것.
@@ -285,6 +322,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         memoEditRequest: (id, index, contents) => {
             return dispatch(memoEditRequest(id, index, contents))
+        },
+        memoStarRequest: (id, index) => {
+            return dispatch(memoStarRequest(id, index))
         }
     };
 };
