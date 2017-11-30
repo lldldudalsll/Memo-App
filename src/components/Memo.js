@@ -15,6 +15,38 @@ class Memo extends Component {
         this.toggleEdit = this.toggleEdit.bind(this);
         this.handleRemove = this.handleRemove.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleStar = this.handleStar.bind(this);
+    }
+
+    componentDidMount() {
+        // WHEN COMPONENT MOUNTS, INITIALIZE DROPDOWN
+        // (TRIGGERED WHEN REFRESHED)
+        $('#dropdown-button-'+this.props.data._id).dropdown({
+            belowOrigin: true // Displays dropdown below the button
+        });
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        let current = {
+            props: this.props,
+            state: this.state
+        };
+
+        let next = {
+            props: nextProps,
+            state: nextState
+        };
+
+        let update = JSON.stringify(current) !== JSON.stringify(next);
+        return update;
+    }
+
+    componentDidUpdate() {
+        // WHEN COMPONENT UPDATES, INITIALIZE DROPDOWN
+        // (TRIGGERED WHEN LOGGED IN)
+        $('#dropdown-button-'+this.props.data._id).dropdown({
+            belowOrigin: true // Displays dropdown below the button
+        });
     }
 
     toggleEdit() {
@@ -48,6 +80,13 @@ class Memo extends Component {
         this.props.onRemove(id, index);
     }
 
+    handleStar() {
+        const id = this.props.data._id;
+        const index = this.props.index;
+
+        this.props.onStar(id, index);
+    }
+
     render() {
         var { data, ownership } = this.props; // 비구조화 할당.
 
@@ -65,6 +104,8 @@ class Memo extends Component {
             </div>
         );
 
+        const starStyle = (this.props.data.starred.indexOf(this.props.currentUser) > -1) ? { color: '#ff9980' } : { };
+
         const memoView = (
             <div className="card">
                 <div className="info">
@@ -75,7 +116,9 @@ class Memo extends Component {
                     {data.contents}
                 </div>
                 <div className="footer">
-                    <i className="material-icons log-footer-icon star icon-button">star</i>
+                    <i className="material-icons log-footer-icon star icon-button"
+                        style={starStyle}
+                        onClick={this.handleStar}>star</i>
                     <span className="star-count">{data.starred.length}</span>
                 </div>
             </div>
@@ -104,29 +147,15 @@ class Memo extends Component {
             </div>
         );
     }
-
-    componentDidUpdate() {
-        // WHEN COMPONENT UPDATES, INITIALIZE DROPDOWN
-        // (TRIGGERED WHEN LOGGED IN)
-        $('#dropdown-button-'+this.props.data._id).dropdown({
-            belowOrigin: true // Displays dropdown below the button
-        });
-    }
-
-    componentDidMount() {
-        // WHEN COMPONENT MOUNTS, INITIALIZE DROPDOWN
-        // (TRIGGERED WHEN REFRESHED)
-        $('#dropdown-button-'+this.props.data._id).dropdown({
-            belowOrigin: true // Displays dropdown below the button
-        });
-    }
 }
 
 Memo.propTypes = {
     data: PropTypes.object,
     ownership: PropTypes.bool,
     onRemove: PropTypes.func,
-    onEdit: PropTypes.func
+    onEdit: PropTypes.func,
+    onStar: PropTypes.func,
+    currentUser: PropTypes.string
 }
 
 Memo.defaultProps = {
@@ -148,7 +177,11 @@ Memo.defaultProps = {
     onEdit: (id, index, contents) => {
         console.error('onEdit function not defined')
     },
-    index: -1
+    index: -1,
+    onStar: (id, index) => {
+        console.error('star function not defined');
+    },
+    currentUser: ''
 }
 
 export default Memo;
