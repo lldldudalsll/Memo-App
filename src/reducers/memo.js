@@ -20,6 +20,10 @@ const initialState = {
     edit: {
         status: 'INIT',
         error: -1,
+    },
+    star: {
+        status: 'INIT',
+        error: -1
     }
 };
 
@@ -142,6 +146,33 @@ export default function memo(state, action) {
         case types.MEMO_EDIT_FAILURE:
             return update(state, {
                 edit: {
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
+                }
+            });
+
+        // Starred
+        case types.MEMO_STAR:
+            return update(state, {
+                star: {
+                    status: { $set: 'WAITING' },
+                    error: { $set: -1 }
+                }
+            });
+        case types.MEMO_STAR_SUCCESS: 
+            return update(state, {
+                star: {
+                    status: { $set: 'SUCCESS' }
+                },
+                list: {
+                    data: {
+                        [action.index]: { $set: action.memo }
+                    }
+                }
+            });
+        case types.MEMO_STAR_FAILURE:
+            return update(state, {
+                star: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }
