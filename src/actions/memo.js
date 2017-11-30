@@ -10,7 +10,10 @@ import {
     MEMO_REMOVE_FAILURE,
     MEMO_EDIT,
     MEMO_EDIT_SUCCESS,
-    MEMO_EDIT_FAILURE
+    MEMO_EDIT_FAILURE,
+    MEMO_STAR,
+    MEMO_STAR_SUCCESS,
+    MEMO_STAR_FAILURE
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -177,4 +180,42 @@ export function memoEditFailure(error) {
         type: MEMO_EDIT_FAILURE,
         error
     }
+}
+
+/* MEMO TOGGLE STAR */
+export function memoStarRequest(id, index) {
+    return (dispatch) => {
+        dispatch(memoStar());
+
+        return axios.post('/api/memo/star/' + id)
+        .then((response) => {
+            // console.log(response);
+            dispatch(memoStarSuccess(index, response.data.memo));
+        })
+        .catch((error) => {
+            console.log(error);
+            dispatch(memoStarFailure());
+        })
+    };
+}
+
+export function memoStar() {
+    return {
+        type: MEMO_STAR
+    };
+}
+
+export function memoStarSuccess(index, memo) {
+    return {
+        type: MEMO_STAR_SUCCESS,
+        index,
+        memo
+    };
+}
+
+export function memoStarFailure(error) {
+    return{
+        type: MEMO_STAR_FAILURE,
+        error
+    };
 }
