@@ -48,6 +48,70 @@ router.post('/', (req, res) => {
 });
 
 /*
+    TOGGLES STAR OF MEMO: POST /api/memo/star/:id
+*/
+
+router.post('/star/:id', (req, res) => {
+    // CHECK MEMO ID VALIDITY
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            error: "INVALID ID",
+            code: 1
+        });
+    }
+    // CHECK LOGIN STATUS
+    if(typeof req.session.loginInfo === 'undefined') {
+        return res.status(403).json({
+            error: "NOT LOGGED IN",
+            code: 2
+        });
+    }
+    // FIND MEMO
+    Memo.findById(req.params.id, (err, memo) => {
+        if(err) throw err;
+
+        // MEMO DOES NOT EXIST
+        if(!memo) {
+            return res.status(404).json({
+                error: "NO RESOURCE",
+                code: 3
+            });
+        }
+
+        // GET INDEX OF USERNAME IN THE ARRAY
+        let index = memo.starred.indexOf(req.session.loginInfo.username);
+
+        // CHECK WHETHER THE USER ALREADY HAS GIVEN A STAR
+        let hasStarred = (index === -1) ? false : true;
+
+        if(!hasStarred) {
+            // IF IT DOES NOT EXIST
+            memo.starred.push(req.session.loginInfo.username);
+        } else {
+            // ALREADY starred
+            memo.starred.splice(index, 1);
+        }
+
+        // SAVE THE MEMO
+        memo.save((err, memo) => {
+            if(err) throw err;
+            res.json({
+                success: true,
+                'has_starred': !hasStarred,
+                memo,
+            });
+        });
+
+        // 이 API 는 주어진 :id 값을 가진 메모를 찾고
+        // 해당 메모의 starred 데이터 배열에 자신의 아이디가 존재하지 않는다면
+        // 자신의 아이디를 starred 데이터 배열에 추가하고,
+        // 이미 존재한다면 starred 데이터 배열에서 제거합니다.
+        // API 실행이 완료되면 별을 주었는지 가져갔는지에 대한 값 
+        // has_star 과 새로운 메모데이터인 memo 객체를 반환합니다 (업데이트를 할 수 있게끔)
+    });
+});
+
+/*
     MODIFY MEMO: PUT /api/memo/:id
     BODY SAMPLE: { contents: "sample "}
 */
@@ -231,6 +295,6 @@ router.get('/:listType/:id', (req, res) => {
             return res.json(memos)
         })
     }
-})
+});
 
 export default router;
