@@ -82,6 +82,9 @@ Express server runs on port 3000, and dev server runs on port 4000.
 - 예전 버전에서 사용하던 mongoose.Connect()에러. mongoose.createConnection() 을 사용하여 해결
 - 마찬가지로 예전 버전에서 사용된 ('mongodb://localhost/codelab');만 사용시 에러. {useMongoClient: true} 코드추가로 해결('mongodb://localhost/codelab', {useMongoClient: true});
 
+</br>
+</br>
+
 ### Step 02 (17.11.15)
 
 #### 작업내역
@@ -115,6 +118,9 @@ Express server runs on port 3000, and dev server runs on port 4000.
 #### 발견 에러와 해결방법
 - webpack.dev.congig.js 에서 플러그인 경고, 
 - new webpack.optimize.OccurrenceOrderPlugin() ``r 하나 추가`` stackoverflow 참조
+
+</br>
+</br>
 
 ### Step 03 (17.11.16)
 
@@ -207,9 +213,6 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - 로그인 / 회원가입 페이지에서는 헤더 보이지 않게 하기    
 
-
-
-</br>
 </br>
 
 #### 발견에러 및 해결방법
@@ -330,6 +333,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - 내일은 해결할수 있을까..
 
+</br>
+</br>
 
 ### Step 05 (17.11.20)
 
@@ -373,8 +378,7 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - The above error occurred in the <App> component
     - 라우터 문제로 파악하고 라우터 구조를 고쳐보았으나 해결되지 않음.
     - componentDidMount 안에서 getStatusRequest가 props지정이 안되있어서 그런줄 알고 const { getStatusRequest } = this.props; 했으나 해결x
-    - 문제가 무엇이냐..
-    - request를 requset 철자 에러..실화냐 몇시간을..
+    - request를 requset 철자 에러.
 
 - GET /api/account/getInfo 500 발생
     - session 처리중 req, res 오타로 인한 에러. 해결
@@ -382,7 +386,7 @@ Express server runs on port 3000, and dev server runs on port 4000.
 - api/account/getInfo 포스트맨에서 401에러. 
     - 웹상에서 제대로 나옴. 로그인하고 postman으로 실행하면 {success: true}가 나오지 않음.
     - 로그인도 세션도 유지 되는데 어떤 이유인지 알 수 없다.
-    - 값을 넣을 body도 비활성화 되어있어 값을 넣을 수도 없다. 일단 중요한건 아니라고 판단되 구현 먼저하고 나중에 포스트맨 사용법도 공부좀 해야겠다.
+    - 값을 넣을 body도 비활성화 되어있어 값을 넣을 수도 없다. 일단 중요한건 아니라고 판단되 구현 먼저하고 나중에 포스트맨 사용법을 깊게 숙지하자.
 
 </br>
 </br>
@@ -731,7 +735,64 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - Memo 컴포넌트에 shouldComponentUpdate 메소드 추가 
         - 이렇게 추가해주면 CPU 자원이 낭비되는 문제를 해결.
 
+- 유저 검색기능 구현하기
+    - 특정유저의 메모 불러오는 API 만들기
+    - Wall 컨테이너 컴포넌트 만들기
+    - 컨테이너 인덱스에 Wall 추가
+    - Index에서 /wall/:username 라우트 추가
+
 
 #### 발견에러 및 해결방법
-    - 별점시 404에러. memoStarRequest 요청시에 /api/memo/star/ 에서 star 뒤 / 빼먹음으로 인한 에러. 
+- 별점시 404에러. memoStarRequest 요청시에 /api/memo/star/ 에서 star 뒤 / 빼먹음으로 인한 에러. 
+
+</br>
+</br>
+
+### Step 12 (17.12.02)
+
+#### 작업내역
+
+- 유저 검색기능 구현하기 이어서
+    - 기존에 작성한 actions/memo.js의 memoListRequest 에서 특정 유저의 메모를 불러올 수 있도록 수정
+        - 이제 username 이 주어진다면 요청 할 URL이 다르게 설정 될것.
+    - Home 컴포넌트에서 memoListRequest 를 사용 할 때, username 을 parameter 로 전달
+    - Wall 컨테이너 컴포넌트에서 Home 컴포넌트 불러와서 렌더링
+        - 여기까지하면 /wall/:username 으로 직접 링크를 쳐서 들어갔을때, 초기 로딩은 잘 되지만  
+        그 상태에서 나중에 다른사람을 검색해서 또 들어갔을때 (Link 컴포넌트를 통하여 라우팅 했을 경우)  
+        컴포넌트가 unmount 되고 다시 mount 되는게 아니라 update 되기 때문에 원하는대로 작동하지 않는다.  
+        따라서 componentDidUpdate LifeCycle API 를 통하여 username 이 변한것을 감지하고 변했을 시  
+        componentWillUnmount 와 componentDidMount 메소드를 임의로 실행한다. 이렇게 한다고 다시 Mount 되는것은 아니지만  
+        unmount 될 때와 mount 될 때 실행하도록 지정한 코드들을 실행 할 수 있다.
+
+        - Home 컨테이너 컴포넌트 오류 미리 해결하기  
+        componentDidMount 부분에 loadUntilScrollable 메소드를 메모 초기 로딩 후 1초뒤 실행시키도록 함  
+        (나중에 담벼락의 유저가 변경되면서 메모가 사라질 때도 애니메이션이 적용된다.  
+        애니메이션이 1초 걸리기때문에 1초뒤에 스크롤바가 있는지 없는지 확인하고 추가로딩 여부를 정하도록)  
+        이 부분을 해결해놓지 않으면 나중에 메모를 처음 로딩 하는 부분에서 최종적으론 스크롤바가 없어도 스크롤바가 있는것으로 인식 할 가능성.
+
+    - 담벼락 헤더를 위한 스타일 추가
+        - 담벼락 헤더 랜더링  
+        이제 헤더가 보이긴 하지만 로딩 하는 과정에서 배열의 크기가 0이기 때문에 아주 짧은 시간동안 메모가 없다는 메시지가 뜰 수 있음.  
+        이 부분을 고치려면 state 를 통하여 initiallyLoaded 라는 값을 만들어서 이 값이 true 일때만 해당 메시지를 보여주도록 설정  
+        컴포넌트가 생성 되었을 때 값은 false 이고 첫 불러오기 요청이 끝났을때 값을 true로 설정.  
+        그리고 component가 unmount 될 때는 false로 다시 초기화
+
+    - initiallyLoaded state 만들기 
+
+    - Memo 컴포넌트 유저네임 클릭시 담벼락으로 이동
+
+    - 검색창 구현하기
+
+
+#### 발견오류 및 해결방법
+
+- 라우터 설정문제로 wall에서 계속된 404에러. historyApiFallback: true 설정도 되어있는데 에러가 남
+    - index.html 파일이 bundle.js 하나에서만 로드 될 수 있기 때문에 브라우저는 경로가 주소 표시 줄의 경로와 관련 있다고 간주. 
+    - 서버의 실제 파일 구조가 무엇인지 전혀 알 수 없으므로 이 경우 루트 상대 경로를 사용해야 한다.
+    ```html
+    <script src="bundle.js"></script>  // x
+    <script src="/bundle.js"></script> // o
+    // 출처: https://teamtreehouse.com/community/encountering-a-neterraborted-error-and-404-error-when-refreshing-page-within-3-nested-routes
+    ```
+
 
