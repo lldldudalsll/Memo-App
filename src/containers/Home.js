@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Write, MemoList } from 'components';
 import { 
@@ -23,7 +24,8 @@ class Home extends React.Component {
         this.loadOldMemo = this.loadOldMemo.bind(this);
 
         this.state = {
-            loadingState: false
+            loadingState: false,
+            initiallyLoaded: false
         }
     }
 
@@ -53,9 +55,13 @@ class Home extends React.Component {
 
         this.props.memoListRequest(true, undefined, undefined, this.props.username).then(
             () => {
+                // LOAD MEMO UNTIL SCROLLABLE
+                setTimeout(loadUntilScrollable, 1000);
                 // BEGIN NEW MEMO LOADING LOOP
-                loadUntilScrollable();
                 loadMemoLoop();
+                this.setState({
+                    initiallyLoaded: true
+                });
             }
         );
 
@@ -85,6 +91,17 @@ class Home extends React.Component {
 
         // REMOVE WINDOWS SCROLL LISTENER
         $(window).unbind();
+
+        this.setState({
+            initiallyLoaded: false
+        });
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(this.props.username !== prevProps.username) {
+            this.componentWillUnmount();
+            this.componentDidMount();
+        }
     }
 
     // Load memo
@@ -102,10 +119,10 @@ class Home extends React.Component {
         }
         // IF PAGE IS EMPTY, DO THE INITIAL LOADING
         if(this.props.memoData.length === 0) 
-            return this.props.memoListRequest(true);
+            return this.props.memoListRequest(true, undefined, undefined, this.props.username);
         
 
-        return this.props.memoListRequest(false, 'new', this.props.memoData[0]._id);
+        return this.props.memoListRequest(false, 'new', this.props.memoData[0]._id, this.props.username);
     }
 
     loadOldMemo() {
@@ -122,7 +139,7 @@ class Home extends React.Component {
         let lastId = this.props.memoData[this.props.memoData.length - 1]._id;
 
         // START REQUEST
-        return this.props.memoListRequest(false, 'old', lastId).then(() => {
+        return this.props.memoListRequest(false, 'old', lastId, this.props.username).then(() => {
             // IF IT IS LAST PAGE, NOTIFY
             if(this.props.isLast) {
                 Materialize.toast('You are reading the last page', 2000);
@@ -280,9 +297,29 @@ class Home extends React.Component {
     render() {
         const write = ( <Write onPost={this.handlePost}/> );
 
+        const emptyView = (
+            <div className="empty-page">
+                <b>{this.props.username}</b> isn't registered or hasn't written any memo
+            </div>
+        );
+
+        const wallHeader = (
+            <div>
+                <div className="container wall-info">
+                    <div className="card wall-info red lighten-3 white-text">
+                        <div className="card-content">
+                            {this.props.username}
+                        </div>
+                    </div>
+                </div>
+                { this.props.memoData.length === 0 && this.state.initiallyLoaded ? emptyView : undefined }
+            </div>
+        );
+
         return(
             <div className="wrapper">
-                { this.props.isLoggedIn ? write : undefined }
+                { typeof this.props.username !== "undefined" ? wallHeader : undefined }
+                { this.props.isLoggedIn && typeof this.props.username === "undefined" ? write : undefined }
                 <MemoList data={this.props.memoData} 
                           currentUser={this.props.currentUser}
                           onRemove={this.handleRemove}
@@ -293,6 +330,14 @@ class Home extends React.Component {
         );
     }
 }
+
+Home.PropTypes = {
+    username: PropTypes.string
+};
+
+Home.defaultProps = {
+    username: undefined
+};
 
 const mapStateToProps = (state) => {
     return {
