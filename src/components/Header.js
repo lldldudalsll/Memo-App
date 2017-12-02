@@ -27,7 +27,13 @@ class Header extends React.Component {
                 <Link to="/" className="brand-logo center">MEMOPAD</Link>
             
                 <ul>
-                  <li><a><i className="material-icons">search</i></a></li>
+                    <li>
+                        {/* <Link to="/wall"> */}
+                        <a>
+                            <i className="material-icons">search</i>
+                        </a>
+                        {/* </Link> */}
+                    </li>
                 </ul>
             
                 <div className="right">
