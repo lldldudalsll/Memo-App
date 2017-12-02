@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 // Router
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 // Container Components
-import { App, Home, Login, Register, NotFound } from 'containers';
+import { App, Home, Login, Register, Wall } from 'containers';
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
@@ -19,19 +19,15 @@ const store = createStore(reducer, applyMiddleware(thunk),
 const rootElement = document.getElementById('root');
 ReactDOM.render(
     <Provider store={store}>
-        <Router>
-            <div>
-                {/* <div> */}
-                    {/* <Switch> */}
-                        <Route path="/" component={App}/>
-                        <Route path="/home" component={Home}/>
-                        <Route path="/login" component={Login}/>
-                        <Route path="/register" component={Register}/>
-                        {/* <Route path="*" component={NotFound}/> */}
-                    {/* </Switch> */}
-                {/* </div> */}
+        <BrowserRouter>
+            <div> 
+                <Route path="/" component={App}/>
+                <Route path="/home" component={Home}/>
+                <Route path="/login" component={Login}/>
+                <Route path="/register" component={Register}/>
+                <Route path="/wall/:username" component={Wall}/>
             </div>
-        </Router>
+        </BrowserRouter>
     </Provider>
     , rootElement
 );
