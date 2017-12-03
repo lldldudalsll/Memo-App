@@ -1,11 +1,13 @@
 import authentication from './authentication';
 import memo from './memo';
+import search from './search';
 
 import { combineReducers } from 'redux';
 
 export default combineReducers({
     authentication, 
-    memo
+    memo,
+    search
 });
 
 // Reducer란 변화를 일으키는 함수이고 순수해야 합니다.
