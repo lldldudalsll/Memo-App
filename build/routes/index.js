@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _express = require('express');
@@ -21,6 +21,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var router = _express2.default.Router();
 // API 라우터에 Memo 라우터 추가 
 // API 루트 라우터 생성
+
+
+router.use('/*', function (req, res, next) {
+    res.setHeader("Expires", "-1");
+    res.setHeader("Cache-Control", "must-revalidate, private");
+    next();
+});
 
 router.use('/account', _account2.default);
 router.use('/memo', _memo2.default);
