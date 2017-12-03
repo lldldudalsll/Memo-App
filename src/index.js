@@ -22,7 +22,6 @@ ReactDOM.render(
         <BrowserRouter>
             <div> 
                 <Route path="/" component={App}/>
-                <Route path="/home" component={Home}/>
                 <Route path="/login" component={Login}/>
                 <Route path="/register" component={Register}/>
                 <Route path="/wall/:username" component={Wall}/>
