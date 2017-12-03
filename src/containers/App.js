@@ -3,13 +3,15 @@ import { Header } from 'components';
 import { Home } from 'containers';
 import { connect } from 'react-redux';
 import { getStatusRequest, logoutRequest } from 'actions/authentication';
-// import * as authentication from 'actions/authentication';
+import { userSearchRequest } from 'actions/search';
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.handleLogout = this.handleLogout.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
     }
     // 컴포넌트가 만들어지고 첫 렌더링을 마친 후 실행된다. 이 안에서 다른 JS framework 연동,
     // setTimeout, setInterval 및 ajax, DOM처리 등을 사용 할 수 있다.
@@ -74,16 +76,24 @@ class App extends React.Component {
         );
     }
 
+    handleSearch(keyword) {
+        this.props.userSearchRequest(keyword)
+    }
+
     render(){
         /* Check whether current route is login or register using regex */
         let re = /(login|register)/;
         let isAuth = re.test(this.props.location.pathname)
+        let le = /(wall)/;
+        let isWall = le.test(this.props.location.pathname)
 
         return (
             <div>
                 {isAuth ? undefined : <Header isLoggedIn={this.props.status.isLoggedIn}
-                                                onLogout={this.handleLogout}/>}
-                {isAuth ? undefined : <Home/>}
+                                                onLogout={this.handleLogout}
+                                                onSearch={this.handleSearch}
+                                                usernames={this.props.searchResults}/>}
+                {isAuth || isWall ? undefined : <Home/>}
             </div>
         );
     }
@@ -92,7 +102,8 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.status
+        status: state.authentication.status,
+        searchResults: state.search.usernames
     };
 };
 
@@ -103,6 +114,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         logoutRequest: () => {
             return dispatch(logoutRequest());
+        },
+        userSearchRequest: (keyword) => {
+            return dispatch(userSearchRequest(keyword));
         }
     };
 };
