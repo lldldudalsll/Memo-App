@@ -49,6 +49,9 @@ npm install
 
 Express server runs on port 3000, and dev server runs on port 4000.
 
+</br>
+</br>
+
 ### Step 01 (17.11.14)
 
 #### 작업 내역
@@ -56,6 +59,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
 - 기본 디렉토리 설정
 - 기본 환경설정 완료 (react, react-dom, webpack, babel, express, mongoose, morgan)
 - express 서버 연결 확인, dev 서버 연결 확인 (postman 사용)
+
+</br>
 
 #### 발견 에러와 해결 방법
 1. 구 버전 webpack.config.js module에서 컴파일 에러 발생
@@ -114,6 +119,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - 읽기기능 구현하기: GET /api/memo
     - 삭제 기능 구현하기: DELETE /api/memo/:id 
     - 수정 기능 구현하기: PUT /api/memo/:id
+
+</br>
 
 #### 발견 에러와 해결방법
 - webpack.dev.congig.js 에서 플러그인 경고, 
@@ -317,6 +324,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - 비밀번호 input에서 엔터를 눌렀을 때 로그인/회원가입 트리거
 
+</br>
+
 #### 발생 에러와 해결방법
 
 - net::ERR_EMPTY_RESPONSE 에러 발생. 아직 원인을 모르겠음.
@@ -362,6 +371,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - Header 컴포넌트 수정
 
 - 계정인증 완료!
+
+</br>
 
 
 #### 발견에러 및 해결방법
@@ -410,6 +421,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - Memo Creation 완료!
 
+</br>
+
 #### 발견에러 및 해결방법
 - Home 컴포넌트 import parsing error
     - 뭔진 몰라도 재부팅 후 사라짐.
@@ -456,6 +469,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
 
 - MemoList data api로 불러오기 성공!!
 
+</br>
+
 #### 발견에러 및 해결방법
 
 - 딱히 중요한 에러는 없었음.
@@ -474,6 +489,8 @@ Express server runs on port 3000, and dev server runs on port 4000.
         가장 아래에 있는 메모의 _id 값보다 낮은 _id 를 갖고있는 메모를 쿼리하면 이전 메모들을 읽을 수 있을 것.
 
     - 메모 추가 로딩 API 구현
+
+</br>
 
 #### 발견에러 및 해결방법
 
@@ -611,6 +628,7 @@ Express server runs on port 3000, and dev server runs on port 4000.
         }
         ```
 
+</br>
 
 #### 발견에러 및 해결방법
 - server/routes/memo 에서 memos 철자 에러 해결.
@@ -660,6 +678,7 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - MemoList 컴포넌트에서 onEdit 함수 Memo로 전달
     - Memo 컴포넌트 수정기능 구현
 
+</br>
 
 #### 발견에러 및 해결방법
 - Encountered two children with the same key error 
@@ -741,6 +760,7 @@ Express server runs on port 3000, and dev server runs on port 4000.
     - 컨테이너 인덱스에 Wall 추가
     - Index에서 /wall/:username 라우트 추가
 
+</br>
 
 #### 발견에러 및 해결방법
 - 별점시 404에러. memoStarRequest 요청시에 /api/memo/star/ 에서 star 뒤 / 빼먹음으로 인한 에러. 
@@ -794,5 +814,120 @@ Express server runs on port 3000, and dev server runs on port 4000.
     <script src="/bundle.js"></script> // o
     // 출처: https://teamtreehouse.com/community/encountering-a-neterraborted-error-and-404-error-when-refreshing-page-within-3-nested-routes
     ```
+
+</br>
+</br>
+
+### Step 12 (17.12.02)
+
+#### 작업내역
+
+- 유저 검색 구현하기 이어서
+    - 검색창 구현하기
+        - 유저 검색 API 만들기
+        - Search 컴포넌트 생성
+            - 4가지 Method 설정  
+            1. onClose 를 사용하는 handleClose 메소드  
+            2. onSearch 를 사용하는 handleSearch 메소드  
+            3. input 박스 내용이 수정되면 실행될 handleChange 메소드    
+            4. input 박스에서 enter 키가 눌려지면 맨 위에있는 유저네임의 ‘담벼락’ 이동을 위한 handleKeyDown 메소드
+            - esc 이벤트 리스너 추가
+            - mapDataToLinks 구현 ( Link Router로 검색된 아이디 enter시에 '/wall/:username'으로 이동 )
+            - browserHistory가 이제 적용되지 않아 다르게 구현했는데 제대로 작동할지 모르겠다.
+        - Search 컴포넌트 스타일 추가
+        - 컴포넌트 인덱스에 Search 컴포넌트 추가
+        - Header 에서 Search 컴포넌트 로딩 및 검색버튼 누르면 보여지도록 설정 
+            ```js
+            <ReactCSSTransitionGroup transitionName="search" transitionEnterTimeout={300} transitionLeaveTimeout={300}>
+                {this.state.search ? <Search onClose={this.toggleSearch} 
+                                             onSearch={this.props.onSearch}
+                                             usernames={this.props.usernames}/> : undefined}
+            </ReactCSSTransitionGroup>
+            ```
+            - toggleSearch 는 state.search 값을 true, false로 토글하는 메소드
+        - 검색창 애니메이션 스타일 구현
+            - 검색시 위에서 내려오고 닫을 시 위로 올라가도록.
+
+        - ActionTypes 생성
+        - search actionCreate 구현
+        - search reducer 구현
+        - search props and dispatch mapping in containers/App.js
+        - handleSearch method 구현
+        - Header.js에 전달받은 onSearch 와 searchStatus 를 Search 컴포넌트로 전달
+        - Search.js 전달받은 onSearch 와 usernames 를 사용하여 Search 컴포넌트 완성 (handleSearch 구현)
+
+- 빌드
+    - webpack.config.js 수정
+        ```js
+        var webpack = require('webpack');
+
+        module.exports = {
+            /* CODES */
+            
+            plugins:[
+                new webpack.DefinePlugin({
+                'process.env':{
+                    'NODE_ENV': JSON.stringify('production')
+                }
+                }),
+                new webpack.optimize.UglifyJsPlugin({
+                compress:{
+                    warnings: true
+                }
+                })
+            ]
+        };
+        // webpack 을 require 하고 plugins: 부분에 위 처럼 설정을 하면 
+        // 코드가 production 환경으로 컴파일 된다 (일부 경고 출력 사라짐)
+        // 또한 코드가 Uglify 되어 (불필요한 공백 제거) 코드의 용량이 줄어듦
+        ```
+    - 빌드 스크립트 실행
+    ```
+    npm run build
+    npm run start # run the server in production mode
+    ```
+
+- IE 호환하기
+    - Promise 는 구버전의 브라우저에서 지원하지 않으므로 babel-polyfill을 통하여 호환
+    ```
+    npm install --save babel-polyfill
+    ```
+    - webpack.config.js / webpack.dev.config.js 수정
+
+    ```js
+    module.exports = {
+
+    entry: [
+        'babel-polyfill'
+    ]
+    // entry에 추가해주면 된다.
+    ```
+
+- Express API Cache-Control 설정
+    - 크롬에선 문제가 없는데 IE에선 캐시 컨트롤을 이상하게 하게 되면서 새 메모를 불러오지 못하는 버그가 있다.
+    ```js
+    // (server/routes/index.js)
+    import express from 'express';
+    import account from './account';
+    import memo from './memo';
+
+    const router = express.Router();
+
+    router.use('/*', (req, res, next) => {
+        res.setHeader("Expires", "-1");
+        res.setHeader("Cache-Control", "must-revalidate, private");
+        next();
+    });
+
+    router.use('/account', account);
+    router.use('/memo', memo);
+
+    export default router;
+    ```
+
+</br>
+
+#### 발견에러와 해결방법
+- 큰 문제는 없었다
 
 
