@@ -1,4 +1,5 @@
-// 회원가입 / 로그인 / 현재세션체크 API 를 담당할 account 라우터 입니다
+/* 회원가입 / 로그인 / 현재세션체크 / 유저검색 API 를 담당할 account 라우터 */
+
 import express from 'express';
 import Account from '../models/account';
 
@@ -135,6 +136,26 @@ router.post('/logout', (req, res) => {
     req.session.destroy(err => { if(err) throw err; });
     return res.json({ success: true });
     // 현재 세션을 파괴 할 때는 req.session.destroy() 를 사용하면 됩니다.
-})
+});
+
+/*
+    5. 유저 검색 API
+    SEARCH USER: GET /api/account/search/:username
+*/
+router.get('/search/:username', (req, res) => {
+    var re = new RegExp('^' + req.params.username);
+    Account.find({username: { $regex :re }}, { _id: false, username: true })
+    .limit(5)
+    .sort({username: 1})
+    .exec((err, accounts) => {
+        if(err) throw err;
+        res.json(accounts);
+    });
+});
+
+// EMPTY SEARCH REQUEST: GET /api/account/search
+router.get('/search', (req, res) => {
+    res.json([]); // 키워드가 공백이라면, 비어있는 배열을 리턴하자.
+});
 
 export default router;
