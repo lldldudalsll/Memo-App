@@ -10,7 +10,7 @@ React.js, Redux, Express.js and MongoDB 를 사용했습니다.
 - 메모 작성 및 조작 (edit, delete, star)
 - 유저 검색
 
-Preview: 
+Preview: [https://whispering-mesa-74285.herokuapp.com/](https://whispering-mesa-74285.herokuapp.com/)
 
 ## Stack
 - axios
