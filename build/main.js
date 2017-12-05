@@ -42,14 +42,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var app = (0, _express2.default)(); // PARSE HTML BODY
 
 var port = process.env.PORT || 3000;
-var devPort = process.env.PORT || 4000;
+var devPort = 4000;
 
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
 
 /* mongodb connection */
 // mongoose.connect('mongodb://username:password@host:port/database=');
-_mongoose2.default.createConnection(process.env.MONGO_DB, { useMongoClient: true });
+_mongoose2.default.connect(process.env.MONGO_DB, { useMongoClient: true });
 
 var db = _mongoose2.default.connection;
 db.once('open', function () {

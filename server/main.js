@@ -15,14 +15,14 @@ import api from './routes';
 
 const app = express();
 const port = process.env.PORT || 3000;
-const devPort= process.env.PORT || 4000;
+const devPort= 4000;
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 /* mongodb connection */
 // mongoose.connect('mongodb://username:password@host:port/database=');
-mongoose.createConnection(process.env.MONGO_DB, {useMongoClient: true});
+mongoose.connect(process.env.MONGO_DB, {useMongoClient: true});
 
 const db = mongoose.connection;
 db.once('open', function() { console.log('Connected to mongodb server'); });
