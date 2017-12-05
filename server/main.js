@@ -21,10 +21,8 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 /* mongodb connection */
-mongoose.connect(process.env.MONGO_DB, {
-    useMongoClient: true,
-});
 // mongoose.connect('mongodb://username:password@host:port/database=');
+mongoose.createConnection(process.env.MONGO_DB, {useMongoClient: true});
 
 const db = mongoose.connection;
 db.once('open', function() { console.log('Connected to mongodb server'); });
