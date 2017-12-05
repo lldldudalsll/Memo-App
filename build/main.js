@@ -41,21 +41,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // HTTP REQUEST LOGGER
 var app = (0, _express2.default)(); // PARSE HTML BODY
 
-var port = 3000;
-var devPort = 4000;
+var port = process.env.PORT || 3000;
+var devPort = process.env.PORT || 4000;
 
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
 
 /* mongodb connection */
+// mongoose.connect('mongodb://username:password@host:port/database=');
+_mongoose2.default.createConnection(process.env.MONGO_DB, { useMongoClient: true });
+
 var db = _mongoose2.default.connection;
-db.on('error', console.error);
 db.once('open', function () {
     console.log('Connected to mongodb server');
 });
-// mongoose.connect('mongodb://username:password@host:port/database=');
-_mongoose2.default.connect('mongodb://localhost:27017', {
-    useMongoClient: true });
+db.on('error', console.error);
 
 /* use session */
 app.use((0, _expressSession2.default)({
