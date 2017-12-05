@@ -42,7 +42,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var app = (0, _express2.default)(); // PARSE HTML BODY
 
 var port = process.env.PORT || 3000;
-var devPort = 4000;
+// const devPort= 4000;
 
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
@@ -99,12 +99,14 @@ app.listen(port, function () {
     console.log('Express is listening on port', port);
 });
 
-if (process.env.NODE_ENV == 'development') {
-    console.log('Server is running on development mode');
-    var config = require('../webpack.dev.config');
-    var compiler = (0, _webpack2.default)(config);
-    var devServer = new _webpackDevServer2.default(compiler, config.devServer);
-    devServer.listen(devPort, function () {
-        console.log('webpack-dev-server is listening on port', devPort);
-    });
-}
+// if(process.env.NODE_ENV == 'development'){
+//     console.log('Server is running on development mode');
+//     const config = require('../webpack.dev.config');
+//     const compiler = webpack(config);
+//     const devServer = new WebpackDevServer(compiler, config.devServer);
+//     devServer.listen(
+//         devPort, () => {
+//             console.log('webpack-dev-server is listening on port', devPort);
+//         }
+//     );
+// }
