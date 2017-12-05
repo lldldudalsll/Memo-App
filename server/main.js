@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 
-import WebpackDevServer from 'webpack-dev-server';
+// import WebpackDevServer from 'webpack-dev-server';
 import webpack from 'webpack';
 
 import morgan from 'morgan'; // HTTP REQUEST LOGGER
