@@ -4,6 +4,7 @@
 MEMO-APP 는 SPA를 사용한 무한스크롤링형 메모장 application입니다.  
 React.js, Redux, Express.js and MongoDB 를 사용했습니다.  
 출처: [https://velopert.com/tag/reactcodelab](https://velopert.com/tag/reactcodelab) 
+리액트 공부목적으로 출처의 저자가 작성한 코드를 따라 작성한 것이므로 포트폴리오에 적합하지 않음을 알려드립니다.
 
 ## Features
 - 계정인증 (Sign Up / Sign In)
